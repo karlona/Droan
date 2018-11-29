@@ -39,6 +39,8 @@ class Shape:
         self.final_length = self.final_length_calculator()
         self.downwind_length = self.downwind_length_calculator()
         self.pattern_diameter = self.pattern_diameter_calculator()
+        self.before_runway_length = self.before_runway_length_calculator()
+        self.after_runway_length = self.after_runway_length_calculator()
 
     def check_for_exceptions(self, approach_speed, headwind):
         self.excessive_headwind(approach_speed, headwind)
@@ -127,9 +129,17 @@ class Shape:
     def pattern_diameter_calculator(self):
         return self.i[1]
 
+    def before_runway_length_calculator(self):
+        return -1.5 * self.j[0]
+
+    def after_runway_length_calculator(self):
+        return self.d[0] - self.j[0] / 2
+
 
 East_Bay = Shape(163, 3, 30, 2.54, 75, 13.4, 0)
 print("Final leg is {0:1.0f} meters".format(East_Bay.final_length))
 print("Straight climb distance is {0:1.0f} meters".format(East_Bay.initial_climb_length))
 print("Pattern width is {0:1.0f} meters".format(East_Bay.pattern_diameter))
 print("Downwind distance is {0:1.0f} meters".format(East_Bay.downwind_length))
+print("Available distance needed before runway is {0:1.0f} meters.".format(East_Bay.before_runway_length))
+print("Available distance needed after runway is {0:1.0f} meters.".format(East_Bay.after_runway_length))
