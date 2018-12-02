@@ -23,6 +23,7 @@ class Shape:
 
         self.check_for_exceptions(approach_speed, headwind)
 
+        # Points a through j are detailed in pattern.pdf
         self.a = self.a_calculator(field_length, glide_slope)
         self.b = self.b_calculator(field_length)
         self.c = self.c_calculator(field_length)
