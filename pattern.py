@@ -35,7 +35,6 @@ class Shape:
         self.f = self.f_calculator()
         #  self.e = self.e_calculator() Not needed
 
-        # Testing pushing without terminal
         self.initial_climb_length = self.straight_climb_length_calculator()
         self.descent_length = self.descent_length_calculator()
         self.final_length = self.final_length_calculator()
