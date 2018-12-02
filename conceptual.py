@@ -16,6 +16,8 @@ class Mission:
             self.range = length
         elif length_type == 'endurance':
             self.endurance = length
+        else:
+            raise NameError('Length type {} not found.  Accepted length types are \'range\' and \'endurance.\'')
         self.speed_cruise = speed
         self.altitude_cruise = altitude
         self.field_length = runway
@@ -27,13 +29,16 @@ class Mission:
 
     def detail_phases(self, phases):
         for n in range(phases):
+            pass # just added so that the code runs
             # User defined mission phase specifics including speed, altitude, climb/descend, accel/deccel
 
 class Aircraft:
     """ This class serves as the beginning of a conceptual aircraft design based on mission requirements. """
 
     def __init__(self, mission, energy, propulsion):
-
+            self.mission = mission
+            self.energy = energy
+            self.propulsion = propulsion
 
     def preliminary_estimate_takeoff_weight(self):
         guess_takeoff_weight = input("Guess a takeoff weight in kilograms.")
@@ -41,7 +46,8 @@ class Aircraft:
         self.historical_empty_weight()
 
     def energy_weight(self):
-
+        return
 
     def historical_empty_weight(self):
+        return
         #
