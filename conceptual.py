@@ -32,6 +32,7 @@ class Mission:
             pass # just added so that the code runs
             # User defined mission phase specifics including speed, altitude, climb/descend, accel/deccel
 
+
 class Aircraft:
     """ This class serves as the beginning of a conceptual aircraft design based on mission requirements. """
 
@@ -50,4 +51,19 @@ class Aircraft:
 
     def historical_empty_weight(self):
         return
-        #
+
+
+class Battery:
+    """ The aircraft battery is sized to execute the provided mission with appropriate power and capacity. """
+
+    def __init__(self):
+        return
+
+    def determine_number_in_series(self):
+        return
+
+    def determine_number_in_parallel(self):
+        return
+
+    def calculate_battery_cell_mass(self):
+        return
