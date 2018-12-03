@@ -29,7 +29,7 @@ class Mission:
 
     def detail_phases(self, phases):
         for n in range(phases):
-            pass # just added so that the code runs
+            pass  # just added so that the code runs
             # User defined mission phase specifics including speed, altitude, climb/descend, accel/deccel
 
 
@@ -53,7 +53,7 @@ class Aircraft:
         return
 
 
-class Battery:
+class BatteryWeight:
     """ The aircraft battery is sized to execute the provided mission with appropriate power and capacity. """
 
     def __init__(self):
@@ -67,3 +67,26 @@ class Battery:
 
     def calculate_battery_cell_mass(self):
         return
+
+
+class TakeoffPower:
+    """ An analysis of the power requirements for the takeoff mission phase is performed. """
+
+    def __init__(self, field_length, takeoff_mass, takeoff_drag_coefficient, planform_area, takeoff_speed,
+                 obstacle_height):
+        self.field_length = field_length
+        self.takeoff_mass = takeoff_mass
+        self.takeoff_drag_coefficient = takeoff_drag_coefficient
+        self.planform_area = planform_area
+        self.takeoff_speed = takeoff_speed
+        self.obstacle_height = obstacle_height
+
+    def calculate_energy_required(self):
+        """ Assumes speed over the obstacle equals takeoff speed"""
+        return self.calculate_kinetic_energy() + self.calculate_potential_energy()
+
+    def calculate_kinetic_energy(self):
+        return self.takeoff_mass * self.takeoff_speed ** 2 / 2
+
+    def calculate_potential_energy(self):
+        return self.takeoff_mass * self.obstacle_height * 9.80665
