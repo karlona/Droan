@@ -72,21 +72,22 @@ class BatteryWeight:
 class TakeoffPower:
     """ An analysis of the power requirements for the takeoff mission phase is performed. """
 
-    def __init__(self, field_length, takeoff_mass, takeoff_drag_coefficient, planform_area, takeoff_speed,
-                 obstacle_height):
-        self.field_length = field_length
+    def __init__(self, ground_roll_length, takeoff_mass, takeoff_speed):
+        self.ground_roll_length = ground_roll_length
         self.takeoff_mass = takeoff_mass
-        self.takeoff_drag_coefficient = takeoff_drag_coefficient
-        self.planform_area = planform_area
         self.takeoff_speed = takeoff_speed
-        self.obstacle_height = obstacle_height
 
-    def calculate_energy_required(self):
-        """ Assumes speed over the obstacle equals takeoff speed"""
-        return self.calculate_kinetic_energy() + self.calculate_potential_energy()
+        self.ground_roll_kinetic_energy = self.calculate_kinetic_energy()
+        self.takeoff_acceleration = self.calculate_takeoff_acceleration()
+        self.ground_roll_time = self.calculate_takeoff_ground_roll_time()
+
+        self.takeoff_power = self.ground_roll_kinetic_energy / self.ground_roll_time
 
     def calculate_kinetic_energy(self):
         return self.takeoff_mass * self.takeoff_speed ** 2 / 2
 
-    def calculate_potential_energy(self):
-        return self.takeoff_mass * self.obstacle_height * 9.80665
+    def calculate_takeoff_acceleration(self):
+        return self.takeoff_speed ** 2 / (2 * self.ground_roll_length)  # (Nocolai, 264 eq. 10.4a)
+
+    def calculate_takeoff_ground_roll_time(self):
+        return self.takeoff_speed / self.takeoff_acceleration  # (Nicolai, 267 section 10.3.5 Time During Takeoff)
