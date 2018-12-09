@@ -1,7 +1,10 @@
-class Mission:
+import math
+
+
+class MissionSpecifications:
     """ This class enables the documentation of a possible mission for an aircraft to be designed around. """
 
-    def __init__(self, payload, length, length_type, speed, altitude, runway, climb, turn, phases):
+    def __init__(self, payload, length, length_type, speed, altitude, runway, climb, turn, unique_phases):
         """ Mission requirements are the inputs for a conceptual aircraft design.
 
         Inputs: payload is the payload mass in kilograms, length is either the mission range in kilometers or the
@@ -25,47 +28,33 @@ class Mission:
         self.turn_radius = turn
 
         # Detail specifics of each mission phase
-        self.detail_phases(phases)
+        self.phases = []
+        for n in range(unique_phases):
+            self.phase_details = input("Input mission phase details as a list with the following values: "
+                                       "[final speed (m/s), L/D, time (s), vertical speed (m/s), speed change (m/s)]")
 
-    def detail_phases(self, phases):
-        for n in range(phases):
-            pass  # just added so that the code runs
-            # User defined mission phase specifics including speed, altitude, climb/descend, accel/deccel
+    def detail_phases(self):
+        """ Specify mission phase specifications for mission phase energy requirement calculations. """
+        self.phases.append(self.phase_details)
 
 
-class Aircraft:
+class TakeoffWeightGuess:  # This should not be a class, but I'm leaving it for now...
     """ This class serves as the beginning of a conceptual aircraft design based on mission requirements. """
 
-    def __init__(self, mission, energy, propulsion):
-            self.mission = mission
-            self.energy = energy
-            self.propulsion = propulsion
+    def __init__(self):
+            self.takeoff_weight_guess = self.estimate_takeoff_weight()
 
-    def preliminary_estimate_takeoff_weight(self):
-        guess_takeoff_weight = input("Guess a takeoff weight in kilograms.")
-        self.energy_weight()
-        self.historical_empty_weight()
-
-    def energy_weight(self):
+    def import_historically_similar_aircraft(self):
         return
 
-    def historical_empty_weight(self):
-        return
+    def estimate_takeoff_weight(self):
+        return input("Initial guess of the takeoff weight, in kilograms.")
 
 
-class BatteryWeight:
-    """ The aircraft battery is sized to execute the provided mission with appropriate power and capacity. """
+class MaximumPower(MissionSpecifications):
+    """Determine the mission phase that has the maximum power requirements."""
 
     def __init__(self):
-        return
-
-    def determine_number_in_series(self):
-        return
-
-    def determine_number_in_parallel(self):
-        return
-
-    def calculate_battery_cell_mass(self):
         return
 
 
@@ -81,7 +70,7 @@ class TakeoffPower:
         self.takeoff_acceleration = self.calculate_takeoff_acceleration()
         self.ground_roll_time = self.calculate_takeoff_ground_roll_time()
 
-        self.takeoff_power = self.ground_roll_kinetic_energy / self.ground_roll_time
+        self.takeoff_power = self.calculate_takeoff_power()
 
     def calculate_kinetic_energy(self):
         return self.takeoff_mass * self.takeoff_speed ** 2 / 2
@@ -90,4 +79,57 @@ class TakeoffPower:
         return self.takeoff_speed ** 2 / (2 * self.ground_roll_length)  # (Nicolai, 264 eq. 10.4a)
 
     def calculate_takeoff_ground_roll_time(self):
-        return self.takeoff_speed / self.takeoff_acceleration  # (Nicolai, 267 section 10.3.5 Time During Takeoff)
+        return self.takeoff_speed / self.takeoff_acceleration  # (Nicolai, p. 267 section 10.3.5 Time During Takeoff)
+
+    def calculate_takeoff_power(self):
+        return self.ground_roll_kinetic_energy / self.ground_roll_time
+
+
+class MotorSpecifications:
+    """ User inputs specifications for the electric motor chosen. """
+
+    def __init__(self, input_voltage, whole_chain_efficiency, max_continuous_power):
+        self.input_voltage = input_voltage
+        self.whole_chain_efficiency = whole_chain_efficiency
+        self.max_continuous_power = max_continuous_power
+
+
+class BatterySpecifications:
+    """ User inputs specifications for the battery chemistry chosen. """
+
+    def __init__(self, nominal_cell_voltage, c_rate, cell_capacity):
+        self.nominal_cell_voltage = nominal_cell_voltage
+        self.c_rate = c_rate
+        self.cell_capacity = cell_capacity
+
+
+class BatteryWeight(TakeoffPower, MotorSpecifications, MissionSpecifications, BatterySpecifications):
+    """ The aircraft battery is sized to execute the provided mission with appropriate power and capacity. """
+
+    def __init__(self, takeoff_power, motor_specifications, mission_specifications, battery_specifications):
+        self.number_in_series = self.size_number_in_series(motor_specifications, battery_specifications)
+
+    def size_number_in_series(self, motor_specifications, battery_specifications):
+        return math.ceil(motor_specifications.input_voltage / battery_specifications.nominal_cell_voltage)
+
+    def size_number_in_parallel(self):
+        return
+
+    def size_parallel_for_endurance(self):
+        return
+
+    def size_parallel_for_power(self):
+        return
+
+    def calculate_battery_cell_mass(self):
+        return
+
+
+class EmptyWeight:
+    def __init__(self):
+        return
+
+
+class TakeoffWeight:
+    def __init__(self):
+        return
