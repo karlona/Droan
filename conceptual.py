@@ -26,6 +26,7 @@ class MissionSpecifications:
         self.field_length = runway
         self.climb = climb
         self.turn_radius = turn
+        self.unique_phases = unique_phases
 
         # Detail specifics of each mission phase
         self.phases = []
@@ -51,10 +52,25 @@ class TakeoffWeightGuess:  # This should not be a class, but I'm leaving it for 
         return input("Initial guess of the takeoff weight, in kilograms.")
 
 
-class MaximumPower(MissionSpecifications):
+class MaximumPower(MissionSpecifications, TakeoffWeightGuess):
     """Determine the mission phase that has the maximum power requirements."""
 
-    def __init__(self):
+    def __init__(self, mission_specifications, takeoff_weight_guess):
+        for n in range(mission_specifications.unique_phases):
+            self.calculate_kinetic_delta(mission_specifications, takeoff_weight_guess, n)
+
+    def calculate_kinetic_delta(self, mission_specifications, takeoff_weight_guess, n):
+        initial_velocity = mission_specifications.phases[n][0] - mission_specifications.phases[n][4]
+        square_velocity_difference = mission_specifications.phases[n][0] ** 2 - initial_velocity ** 2
+        return (takeoff_weight_guess.takeoff_weight_guess / 2) * square_velocity_difference
+
+    def calculate_potential_delta(self):
+        return
+
+    def calculate_aerodynamic_power(self):
+        return
+
+    def calculate_power(self):
         return
 
 
