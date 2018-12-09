@@ -76,7 +76,7 @@ class TakeoffPower:
         return self.takeoff_mass * self.takeoff_speed ** 2 / 2
 
     def calculate_takeoff_acceleration(self):
-        return self.takeoff_speed ** 2 / (2 * self.ground_roll_length)  # (Nicolai, 264 eq. 10.4a)
+        return self.takeoff_speed ** 2 / (2 * self.ground_roll_length)  # (Nicolai, p. 264 eq. 10.4a)
 
     def calculate_takeoff_ground_roll_time(self):
         return self.takeoff_speed / self.takeoff_acceleration  # (Nicolai, p. 267 section 10.3.5 Time During Takeoff)
