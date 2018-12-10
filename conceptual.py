@@ -30,13 +30,18 @@ class MissionSpecifications:
 
         # Detail specifics of each mission phase
         self.phases = []
-        for n in range(unique_phases):
-            self.phase_details = input("Input mission phase details as a list with the following values: "
-                                       "[final speed (m/s), L/D, time (s), vertical speed (m/s), speed change (m/s)]")
+        [self.phases.append(self.input_phase_details(phase)) for phase in range(self.unique_phases)]
 
-    def detail_phases(self):
-        """ Specify mission phase specifications for mission phase energy requirement calculations. """
-        self.phases.append(self.phase_details)
+    def input_phase_details(self, phase):
+        phase_details = input("Input mission phase details as a list with the following values: "
+                              "[final speed (m/s), L/D, time (s), vertical speed (m/s), speed change (m/s)]")
+        this_phases_details = []
+        phase_detail_0 = this_phases_details.append(float(input("Input phase {0} final speed in m/s.".format(str(phase)))))
+        phase_detail_1 = this_phases_details.append(float(input("Input phase {0} L/D.".format(str(phase)))))
+        phase_detail_2 = this_phases_details.append(float(input("Input phase {0} time in s.".format(str(phase)))))
+        phase_detail_3 = this_phases_details.append(float(input("Input phase {0} vertical speed in m/s.".format(str(phase)))))
+        phase_detail_4 = this_phases_details.append(float(input("Input phase {0} speed change in m/s.".format(str(phase)))))
+        return self.phases.append(this_phases_details)
 
 
 class TakeoffWeightGuess:  # This should not be a class, but I'm leaving it for now...
@@ -59,6 +64,7 @@ class MaximumPower(MissionSpecifications, TakeoffWeightGuess):
     def __init__(self, mission_specifications, takeoff_weight_guess):
         self.power_mission_phase = [self.calculate_power(mission_specifications, takeoff_weight_guess, phase)
                                     for phase in range(mission_specifications.unique_phases)]
+        self.maximum_power = max(self.power_mission_phase)
 
     def calculate_power(self, mission_specifications, takeoff_weight_guess, phase):
         return self.calculate_energy_delta_power(mission_specifications, takeoff_weight_guess, phase) \
