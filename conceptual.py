@@ -85,34 +85,6 @@ class MaximumPower:
             return max(final_speed, initial_speed)
 
 
-class TakeoffPower:
-    """ Might delete this class now that MaximumPower exists
-    An analysis of the power requirements for the takeoff mission phase is performed. """
-
-    def __init__(self, ground_roll_length, takeoff_mass, takeoff_speed):
-        self.ground_roll_length = ground_roll_length
-        self.takeoff_mass = takeoff_mass
-        self.takeoff_speed = takeoff_speed
-
-        self.ground_roll_kinetic_energy = self.calculate_kinetic_energy()
-        self.takeoff_acceleration = self.calculate_takeoff_acceleration()
-        self.ground_roll_time = self.calculate_takeoff_ground_roll_time()
-
-        self.takeoff_power = self.calculate_takeoff_power()
-
-    def calculate_kinetic_energy(self):
-        return self.takeoff_mass * self.takeoff_speed ** 2 / 2
-
-    def calculate_takeoff_acceleration(self):
-        return self.takeoff_speed ** 2 / (2 * self.ground_roll_length)  # (Nicolai, p. 264 eq. 10.4a)
-
-    def calculate_takeoff_ground_roll_time(self):
-        return self.takeoff_speed / self.takeoff_acceleration  # (Nicolai, p. 267 section 10.3.5 Time During Takeoff)
-
-    def calculate_takeoff_power(self):
-        return self.ground_roll_kinetic_energy / self.ground_roll_time
-
-
 class MotorSpecifications:
     """ User inputs specifications for the electric motor chosen. """
 
@@ -183,7 +155,8 @@ class TakeoffWeight:
 
 
 droan_mission = MissionSpecifications(1, 30, 'endurance', 22, 120, 120, 2.54, 75, 7, 12.5)
-droan_power_needs = MaximumPower(droan_mission, droan_mass)
+droan_power = MaximumPower(droan_mission)
 droan_motor = MotorSpecifications(11.1, 0.8, 110)
 droan_battery = BatterySpecifications(3.7, 25, 0.5, 200)
-
+droan_battery_pack_mass = BatteryPackMass(droan_power, droan_motor, droan_mission, droan_battery).battery_pack_mass
+print(droan_battery_pack_mass)
