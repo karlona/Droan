@@ -57,6 +57,8 @@ class MaximumPower:
     def __init__(self, mission_specifications):
         self.power_mission_phase = [self.calculate_power(mission_specifications, phase)
                                     for phase in range(mission_specifications.unique_phases)]
+        print("Maximum total power output in watts needed at each phase.")
+        print(self.power_mission_phase)
         self.maximum_power = max(self.power_mission_phase)
 
     def calculate_power(self, mission_specifications, phase):
@@ -85,7 +87,7 @@ class MaximumPower:
 
     def calculate_maximum_speed(self, mission_specifications, phase):
         final_speed = mission_specifications.phases[phase][0]
-        initial_speed = final_speed + mission_specifications.phases[phase][4]
+        initial_speed = final_speed - mission_specifications.phases[phase][4]
         if final_speed == initial_speed:
             return final_speed
         else:
