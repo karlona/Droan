@@ -32,15 +32,22 @@ class MissionSpecifications:
         self.takeoff_weight_guess = guess
 
         # Detail specifics of each mission phase
-        self.phases = [self.input_phase_details(phase) for phase in range(self.unique_phases)]
+        self.phases = [[3, 15, 30, 0, 3],
+                       [13.4, 15, 10, 0, 13.4],
+                       [22.4, 10, 48, 2.54, 9],
+                       [22.4, 20, 1800, 0, 0],
+                       [13.4, 15, 48, -2.54, -9],
+                       [13.4, 10, 60, 0, 0],
+                       [0, 5, 15, -1, -13.4]]
+        # self.phases = [self.input_phase_details(phase) for phase in range(self.unique_phases)]
 
-    def input_phase_details(self, phase):
-        final_speed = float(input("Input phase {0} final speed in m/s.".format(str(phase))))
-        lift_over_drag = float(input("Input phase {0} L/D.".format(str(phase))))
-        time = float(input("Input phase {0} time in s.".format(str(phase))))
-        vertical_speed = float(input("Input phase {0} vertical speed in m/s.".format(str(phase))))
-        speed_change = float(input("Input phase {0} speed change in m/s.".format(str(phase))))
-        return [final_speed, lift_over_drag, time, vertical_speed, speed_change]
+    # def input_phase_details(self, phase):
+    #     final_speed = float(input("Input phase {0} final speed in m/s.".format(str(phase))))
+    #     lift_over_drag = float(input("Input phase {0} L/D.".format(str(phase))))
+    #     time = float(input("Input phase {0} time in s.".format(str(phase))))
+    #     vertical_speed = float(input("Input phase {0} vertical speed in m/s.".format(str(phase))))
+    #     speed_change = float(input("Input phase {0} speed change in m/s.".format(str(phase))))
+    #     return [final_speed, lift_over_drag, time, vertical_speed, speed_change]
 
 
 class MaximumPower:
