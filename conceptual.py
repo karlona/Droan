@@ -2,7 +2,8 @@ import math
 
 
 class MissionSpecifications:
-    """ This class enables the documentation of a possible mission for an aircraft to be designed around. """
+    """ Complete
+    This class enables the documentation of a possible mission for an aircraft to be designed around. """
 
     def __init__(self, payload, length, length_type, speed, altitude, runway, climb, turn, unique_phases):
         """ Mission requirements are the inputs for a conceptual aircraft design.
@@ -29,19 +30,15 @@ class MissionSpecifications:
         self.unique_phases = unique_phases
 
         # Detail specifics of each mission phase
-        self.phases = []
-        [self.phases.append(self.input_phase_details(phase)) for phase in range(self.unique_phases)]
+        self.phases = [self.input_phase_details(phase) for phase in range(self.unique_phases)]
 
     def input_phase_details(self, phase):
-        phase_details = input("Input mission phase details as a list with the following values: "
-                              "[final speed (m/s), L/D, time (s), vertical speed (m/s), speed change (m/s)]")
-        this_phases_details = []
-        phase_detail_0 = this_phases_details.append(float(input("Input phase {0} final speed in m/s.".format(str(phase)))))
-        phase_detail_1 = this_phases_details.append(float(input("Input phase {0} L/D.".format(str(phase)))))
-        phase_detail_2 = this_phases_details.append(float(input("Input phase {0} time in s.".format(str(phase)))))
-        phase_detail_3 = this_phases_details.append(float(input("Input phase {0} vertical speed in m/s.".format(str(phase)))))
-        phase_detail_4 = this_phases_details.append(float(input("Input phase {0} speed change in m/s.".format(str(phase)))))
-        return self.phases.append(this_phases_details)
+        phase_detail_0 = float(input("Input phase {0} final speed in m/s.".format(str(phase))))
+        phase_detail_1 = float(input("Input phase {0} L/D.".format(str(phase))))
+        phase_detail_2 = float(input("Input phase {0} time in s.".format(str(phase))))
+        phase_detail_3 = float(input("Input phase {0} vertical speed in m/s.".format(str(phase))))
+        phase_detail_4 = float(input("Input phase {0} speed change in m/s.".format(str(phase))))
+        return [phase_detail_0, phase_detail_1, phase_detail_2, phase_detail_3, phase_detail_4]
 
 
 class TakeoffWeightGuess:  # This should not be a class, but I'm leaving it for now...
