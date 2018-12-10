@@ -191,3 +191,15 @@ class EmptyWeight:
 class TakeoffWeight:
     def __init__(self):
         return
+
+
+payload = 1
+length = 30
+length_type = 'endurance'
+speed = 22
+altitude = 120
+runway = 120
+climb = 2.54
+turn = 75
+unique_phases = 7
+battery_mass = BatteryPackMass(MaximumPower(MissionSpecifications(payload, length, length_type, speed, altitude, runway, climb, turn, unique_phases), TakeoffWeightGuess()), MotorSpecifications, MissionSpecifications, BatterySpecifications)
