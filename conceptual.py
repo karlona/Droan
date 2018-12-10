@@ -12,7 +12,8 @@ class MissionSpecifications:
         mission endurance in minutes, length_type is either the string 'range' or 'endurance' based on length, speed
         is the cruise speed in meters per second, altitude is the cruise altitude in meters, runway is the runway
         length in meters, climb is the climb rate in meters per second, turn is the turn radius in meters, phases is
-        an integer detailing the number of phases in the mission profile. """
+        an integer detailing the number of phases in the mission profile, guess is the takeoff weight guess in
+        kilograms. """
 
         # Create Class Variables
         self.payload = payload
@@ -181,8 +182,7 @@ class TakeoffWeight:
         return
 
 
-droan_mission = MissionSpecifications(1, 30, 'endurance', 22, 120, 120, 2.54, 75, 7)
-droan_mass = TakeoffWeightGuess(12.5)
+droan_mission = MissionSpecifications(1, 30, 'endurance', 22, 120, 120, 2.54, 75, 7, 12.5)
 droan_power_needs = MaximumPower(droan_mission, droan_mass)
 droan_motor = MotorSpecifications(11.1, 0.8, 110)
 droan_battery = BatterySpecifications(3.7, 25, 0.5, 200)
