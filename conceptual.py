@@ -5,7 +5,7 @@ class MissionSpecifications:
     """ Complete
     This class enables the documentation of a possible mission for an aircraft to be designed around. """
 
-    def __init__(self, payload, length, length_type, speed, altitude, runway, climb, turn, unique_phases):
+    def __init__(self, payload, length, length_type, speed, altitude, runway, climb, turn, unique_phases, guess):
         """ Mission requirements are the inputs for a conceptual aircraft design.
 
         Inputs: payload is the payload mass in kilograms, length is either the mission range in kilometers or the
@@ -28,6 +28,7 @@ class MissionSpecifications:
         self.climb = climb
         self.turn_radius = turn
         self.unique_phases = unique_phases
+        self.takeoff_weight_guess = guess
 
         # Detail specifics of each mission phase
         self.phases = [self.input_phase_details(phase) for phase in range(self.unique_phases)]
@@ -41,50 +42,37 @@ class MissionSpecifications:
         return [final_speed, lift_over_drag, time, vertical_speed, speed_change]
 
 
-class TakeoffWeightGuess:  # This should not be a class, but I'm leaving it for now...
-    """ This class serves as the beginning of a conceptual aircraft design based on mission requirements. """
-
-    def __init__(self):
-            self.takeoff_weight_guess = self.estimate_takeoff_weight()
-
-    def import_historically_similar_aircraft(self):
-        return
-
-    def estimate_takeoff_weight(self):
-        return input("Initial guess of the takeoff weight, in kilograms.")
-
-
-class MaximumPower(MissionSpecifications, TakeoffWeightGuess):
+class MaximumPower:
     """ Complete
     Determine the mission phase that has the maximum power requirements."""
 
-    def __init__(self, mission_specifications, takeoff_weight_guess):
-        self.power_mission_phase = [self.calculate_power(mission_specifications, takeoff_weight_guess, phase)
+    def __init__(self, mission_specifications):
+        self.power_mission_phase = [self.calculate_power(mission_specifications, phase)
                                     for phase in range(mission_specifications.unique_phases)]
         self.maximum_power = max(self.power_mission_phase)
 
-    def calculate_power(self, mission_specifications, takeoff_weight_guess, phase):
-        return self.calculate_energy_delta_power(mission_specifications, takeoff_weight_guess, phase) \
-               + self.calculate_aerodynamic_power(mission_specifications, takeoff_weight_guess, phase)
+    def calculate_power(self, mission_specifications, phase):
+        return self.calculate_energy_delta_power(mission_specifications, phase) \
+               + self.calculate_aerodynamic_power(mission_specifications, phase)
 
-    def calculate_energy_delta_power(self, mission_specifications, takeoff_weight_guess, phase):
-        total_energy_delta = self.calculate_kinetic_delta(mission_specifications, takeoff_weight_guess, phase)\
-                             + self.calculate_potential_delta(mission_specifications, takeoff_weight_guess, phase)
+    def calculate_energy_delta_power(self, mission_specifications, phase):
+        total_energy_delta = self.calculate_kinetic_delta(mission_specifications, phase) \
+                             + self.calculate_potential_delta(mission_specifications, phase)
         phase_time = mission_specifications.phases[phase][2]
         return total_energy_delta / phase_time
 
-    def calculate_kinetic_delta(self, mission_specifications, takeoff_weight_guess, phase):
+    def calculate_kinetic_delta(self, mission_specifications, phase):
         initial_velocity = mission_specifications.phases[phase][0] - mission_specifications.phases[phase][4]
         square_velocity_difference = mission_specifications.phases[phase][0] ** 2 - initial_velocity ** 2
-        return (takeoff_weight_guess.takeoff_weight_guess / 2) * square_velocity_difference
+        return (mission_specifications.takeoff_weight_guess / 2) * square_velocity_difference
 
-    def calculate_potential_delta(self, mission_specifications, takeoff_weight_guess, phase):
+    def calculate_potential_delta(self, mission_specifications, phase):
         altitude_delta = mission_specifications.phases[phase][2] * mission_specifications.phases[phase][3]
-        return 9.80665 * takeoff_weight_guess.takeoff_weight_guess * altitude_delta
+        return 9.80665 * mission_specifications.takeoff_weight_guess * altitude_delta
 
-    def calculate_aerodynamic_power(self, mission_specifications, takeoff_weight_guess, phase):
+    def calculate_aerodynamic_power(self, mission_specifications, phase):
         maximum_speed = self.calculate_maximum_speed(mission_specifications, phase)
-        weight = 9.80665 * takeoff_weight_guess.takeoff_weight_guess
+        weight = 9.80665 * mission_specifications.takeoff_weight_guess
         return weight * maximum_speed / mission_specifications.phases[phase][1]
 
     def calculate_maximum_speed(self, mission_specifications, phase):
@@ -144,7 +132,7 @@ class BatterySpecifications:
         self.battery_cell_mass = self.cell_capacity * self.nominal_cell_voltage / self.specific_energy_density
 
 
-class BatteryPackMass(MaximumPower, MotorSpecifications, MissionSpecifications, BatterySpecifications):
+class BatteryPackMass:
     """ Complete
     The aircraft battery is sized to execute the provided mission with appropriate power and capacity. """
 
@@ -193,13 +181,9 @@ class TakeoffWeight:
         return
 
 
-payload = 1
-length = 30
-length_type = 'endurance'
-speed = 22
-altitude = 120
-runway = 120
-climb = 2.54
-turn = 75
-unique_phases = 7
-battery_mass = BatteryPackMass(MaximumPower(MissionSpecifications(payload, length, length_type, speed, altitude, runway, climb, turn, unique_phases), TakeoffWeightGuess()), MotorSpecifications, MissionSpecifications, BatterySpecifications)
+droan_mission = MissionSpecifications(1, 30, 'endurance', 22, 120, 120, 2.54, 75, 7)
+droan_mass = TakeoffWeightGuess(12.5)
+droan_power_needs = MaximumPower(droan_mission, droan_mass)
+droan_motor = MotorSpecifications(11.1, 0.8, 110)
+droan_battery = BatterySpecifications(3.7, 25, 0.5, 200)
+
