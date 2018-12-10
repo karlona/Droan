@@ -31,7 +31,7 @@ class MissionSpecifications:
         self.unique_phases = unique_phases
         self.takeoff_weight_guess = guess
 
-        # Detail specifics of each mission phase
+        # Detail specifics of each mission phase (temporary manual entry of data for quick testing)
         self.phases = [[3, 15, 30, 0, 3],
                        [13.4, 15, 10, 0, 13.4],
                        [22.4, 10, 48, 2.54, 9],
@@ -121,7 +121,7 @@ class BatteryPackMass:
         self.number_in_parallel = self.size_number_in_parallel(maximum_power, battery_specifications,
                                                                motor_specifications, mission_specifications)
         self.number_of_cells = self.number_in_series * self.number_in_parallel
-        self.battery_pack_mass = self.number_of_cells * self.battery_cell_mass
+        self.battery_pack_mass = self.number_of_cells * battery_specifications.battery_cell_mass
 
     def size_number_in_series(self, motor_specifications, battery_specifications):
         return math.ceil(motor_specifications.input_voltage / battery_specifications.nominal_cell_voltage)
@@ -137,9 +137,10 @@ class BatteryPackMass:
                                     mission_specifications):
         phase_energy = [maximum_power.power_mission_phase[phase] * mission_specifications.phases[phase][2]
                         for phase in range(mission_specifications.unique_phases)]
-        cell_energy_capacity = battery_specifications.nominal_cell_voltage * battery_specifications.cell_capacity\
+        cell_energy_capacity = battery_specifications.nominal_cell_voltage * battery_specifications.cell_capacity \
                                * motor_specifications.whole_chain_efficiency
-        phase_parallel = [phase_energy[phase] / cell_energy_capacity for phase in mission_specifications.unique_phases]
+        phase_parallel = [phase_energy[phase] / cell_energy_capacity for phase
+                          in range(mission_specifications.unique_phases)]
         return sum(phase_parallel)
 
     def size_parallel_for_power(self, maximum_power, battery_specifications, motor_specifications):
