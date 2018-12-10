@@ -33,12 +33,12 @@ class MissionSpecifications:
         self.phases = [self.input_phase_details(phase) for phase in range(self.unique_phases)]
 
     def input_phase_details(self, phase):
-        phase_detail_0 = float(input("Input phase {0} final speed in m/s.".format(str(phase))))
-        phase_detail_1 = float(input("Input phase {0} L/D.".format(str(phase))))
-        phase_detail_2 = float(input("Input phase {0} time in s.".format(str(phase))))
-        phase_detail_3 = float(input("Input phase {0} vertical speed in m/s.".format(str(phase))))
-        phase_detail_4 = float(input("Input phase {0} speed change in m/s.".format(str(phase))))
-        return [phase_detail_0, phase_detail_1, phase_detail_2, phase_detail_3, phase_detail_4]
+        final_speed = float(input("Input phase {0} final speed in m/s.".format(str(phase))))
+        lift_over_drag = float(input("Input phase {0} L/D.".format(str(phase))))
+        time = float(input("Input phase {0} time in s.".format(str(phase))))
+        vertical_speed = float(input("Input phase {0} vertical speed in m/s.".format(str(phase))))
+        speed_change = float(input("Input phase {0} speed change in m/s.".format(str(phase))))
+        return [final_speed, lift_over_drag, time, vertical_speed, speed_change]
 
 
 class TakeoffWeightGuess:  # This should not be a class, but I'm leaving it for now...
@@ -97,7 +97,8 @@ class MaximumPower(MissionSpecifications, TakeoffWeightGuess):
 
 
 class TakeoffPower:
-    """ An analysis of the power requirements for the takeoff mission phase is performed. """
+    """ Might delete this class now that MaximumPower exists
+    An analysis of the power requirements for the takeoff mission phase is performed. """
 
     def __init__(self, ground_roll_length, takeoff_mass, takeoff_speed):
         self.ground_roll_length = ground_roll_length
@@ -135,32 +136,51 @@ class MotorSpecifications:
 class BatterySpecifications:
     """ User inputs specifications for the battery chemistry chosen. """
 
-    def __init__(self, nominal_cell_voltage, c_rate, cell_capacity):
+    def __init__(self, nominal_cell_voltage, c_max, cell_capacity, specific_energy_density):
         self.nominal_cell_voltage = nominal_cell_voltage
-        self.c_rate = c_rate
+        self.c_max = c_max
         self.cell_capacity = cell_capacity
+        self.specific_energy_density = specific_energy_density
+        self.battery_cell_mass = self.cell_capacity * self.nominal_cell_voltage / self.specific_energy_density
 
 
-class BatteryWeight(TakeoffPower, MotorSpecifications, MissionSpecifications, BatterySpecifications):
-    """ The aircraft battery is sized to execute the provided mission with appropriate power and capacity. """
+class BatteryPackMass(MaximumPower, MotorSpecifications, MissionSpecifications, BatterySpecifications):
+    """ Complete
+    The aircraft battery is sized to execute the provided mission with appropriate power and capacity. """
 
-    def __init__(self, takeoff_power, motor_specifications, mission_specifications, battery_specifications):
+    def __init__(self, maximum_power, motor_specifications, mission_specifications, battery_specifications):
         self.number_in_series = self.size_number_in_series(motor_specifications, battery_specifications)
+        self.number_in_parallel = self.size_number_in_parallel(maximum_power, battery_specifications,
+                                                               motor_specifications, mission_specifications)
+        self.number_of_cells = self.number_in_series * self.number_in_parallel
+        self.battery_pack_mass = self.number_of_cells * self.battery_cell_mass
 
     def size_number_in_series(self, motor_specifications, battery_specifications):
         return math.ceil(motor_specifications.input_voltage / battery_specifications.nominal_cell_voltage)
 
-    def size_number_in_parallel(self):
-        return
+    def size_number_in_parallel(self, maximum_power, battery_specifications, motor_specifications,
+                                mission_specifications):
+        power = self.size_parallel_for_power(maximum_power, battery_specifications, motor_specifications)
+        endurance = self.size_parallel_for_endurance(maximum_power, battery_specifications, motor_specifications,
+                                                     mission_specifications)
+        return max(power, endurance)
 
-    def size_parallel_for_endurance(self):
-        return
+    def size_parallel_for_endurance(self, maximum_power, battery_specifications, motor_specifications,
+                                    mission_specifications):
+        phase_energy = [maximum_power.power_mission_phase[phase] * mission_specifications.phases[phase][2]
+                        for phase in range(mission_specifications.unique_phases)]
+        cell_energy_capacity = battery_specifications.nominal_cell_voltage * battery_specifications.cell_capacity\
+                               * motor_specifications.whole_chain_efficiency
+        phase_parallel = [phase_energy[phase] / cell_energy_capacity for phase in mission_specifications.unique_phases]
+        return sum(phase_parallel)
 
-    def size_parallel_for_power(self):
-        return
-
-    def calculate_battery_cell_mass(self):
-        return
+    def size_parallel_for_power(self, maximum_power, battery_specifications, motor_specifications):
+        max_power = maximum_power.maximum_power
+        c_max = battery_specifications.c_max
+        cell_capacity = battery_specifications.cell_capacity
+        whole_chain_efficiency = motor_specifications.whole_chain_efficiency
+        battery_pack_voltage = self.number_in_series * battery_specifications.nominal_cell_voltage
+        return max_power / (c_max * cell_capacity * whole_chain_efficiency * battery_pack_voltage)
 
 
 class EmptyWeight:
