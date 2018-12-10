@@ -53,25 +53,44 @@ class TakeoffWeightGuess:  # This should not be a class, but I'm leaving it for 
 
 
 class MaximumPower(MissionSpecifications, TakeoffWeightGuess):
-    """Determine the mission phase that has the maximum power requirements."""
+    """ Complete
+    Determine the mission phase that has the maximum power requirements."""
 
     def __init__(self, mission_specifications, takeoff_weight_guess):
-        for n in range(mission_specifications.unique_phases):
-            self.calculate_kinetic_delta(mission_specifications, takeoff_weight_guess, n)
+        self.power_mission_phase = [self.calculate_power(mission_specifications, takeoff_weight_guess, phase)
+                                    for phase in range(mission_specifications.unique_phases)]
 
-    def calculate_kinetic_delta(self, mission_specifications, takeoff_weight_guess, n):
-        initial_velocity = mission_specifications.phases[n][0] - mission_specifications.phases[n][4]
-        square_velocity_difference = mission_specifications.phases[n][0] ** 2 - initial_velocity ** 2
+    def calculate_power(self, mission_specifications, takeoff_weight_guess, phase):
+        return self.calculate_energy_delta_power(mission_specifications, takeoff_weight_guess, phase) \
+               + self.calculate_aerodynamic_power(mission_specifications, takeoff_weight_guess, phase)
+
+    def calculate_energy_delta_power(self, mission_specifications, takeoff_weight_guess, phase):
+        total_energy_delta = self.calculate_kinetic_delta(mission_specifications, takeoff_weight_guess, phase)\
+                             + self.calculate_potential_delta(mission_specifications, takeoff_weight_guess, phase)
+        phase_time = mission_specifications.phases[phase][2]
+        return total_energy_delta / phase_time
+
+    def calculate_kinetic_delta(self, mission_specifications, takeoff_weight_guess, phase):
+        initial_velocity = mission_specifications.phases[phase][0] - mission_specifications.phases[phase][4]
+        square_velocity_difference = mission_specifications.phases[phase][0] ** 2 - initial_velocity ** 2
         return (takeoff_weight_guess.takeoff_weight_guess / 2) * square_velocity_difference
 
-    def calculate_potential_delta(self):
-        return
+    def calculate_potential_delta(self, mission_specifications, takeoff_weight_guess, phase):
+        altitude_delta = mission_specifications.phases[phase][2] * mission_specifications.phases[phase][3]
+        return 9.80665 * takeoff_weight_guess.takeoff_weight_guess * altitude_delta
 
-    def calculate_aerodynamic_power(self):
-        return
+    def calculate_aerodynamic_power(self, mission_specifications, takeoff_weight_guess, phase):
+        maximum_speed = self.calculate_maximum_speed(mission_specifications, phase)
+        weight = 9.80665 * takeoff_weight_guess.takeoff_weight_guess
+        return weight * maximum_speed / mission_specifications.phases[phase][1]
 
-    def calculate_power(self):
-        return
+    def calculate_maximum_speed(self, mission_specifications, phase):
+        final_speed = mission_specifications.phases[phase][0]
+        initial_speed = final_speed + mission_specifications.phases[phase][4]
+        if final_speed == initial_speed:
+            return final_speed
+        else:
+            return max(final_speed, initial_speed)
 
 
 class TakeoffPower:
