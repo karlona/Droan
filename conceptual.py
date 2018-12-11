@@ -1,11 +1,11 @@
 import math
 
 
-class MissionSpecifications:
+class Mission:
     """ Complete
     This class enables the documentation of a possible mission for an aircraft to be designed around. """
 
-    def __init__(self, payload, length, length_type, speed, altitude, runway, climb, turn, unique_phases, guess):
+    def __init__(self, payload, range_length, endurance_length, length_type, speed, altitude, runway, climb, turn, unique_phases, guess):
         """ Mission requirements are the inputs for a conceptual aircraft design.
 
         Inputs: payload is the payload mass in kilograms, length is either the mission range in kilometers or the
@@ -17,14 +17,12 @@ class MissionSpecifications:
 
         # Create Class Variables
         self.payload = payload
-        # I think it is bad programming practice to have an input variable that can be two different
-        # things, and to have class variables that may or may not exist depending on the inputs.
-        # I would just create separate variables, both for arguments and for class variables, and fill
-        # one in and have the other one be 'null' or -1 or something.
         if length_type == 'range':
-            self.range = length
+            self.range = range_length
+            self.endurance = None
         elif length_type == 'endurance':
-            self.endurance = length
+            self.endurance = endurance_length
+            self.range = None
         else:
             raise NameError('Length type not found.  Accepted length types are \'range\' and \'endurance.\'')
         self.speed_cruise = speed
@@ -60,7 +58,7 @@ class MaximumPower:
 
     def __init__(self, mission_specifications):
         self.power_mission_phase = [self.calculate_power(mission_specifications, phase)
-                                    for phase in range(mission_specifications.unique_phases)]
+                                    for phase in mission_specifications.phases]
         print("Maximum total power output in watts needed at each phase.")
         print(self.power_mission_phase)
         self.maximum_power = max(self.power_mission_phase)
@@ -72,33 +70,33 @@ class MaximumPower:
     def calculate_energy_delta_power(self, mission_specifications, phase):
         total_energy_delta = self.calculate_kinetic_delta(mission_specifications, phase) \
                              + self.calculate_potential_delta(mission_specifications, phase)
-        phase_time = mission_specifications.phases[phase][2]
+        phase_time = phase[2]
         return total_energy_delta / phase_time
 
     def calculate_kinetic_delta(self, mission_specifications, phase):
-        initial_velocity = mission_specifications.phases[phase][0] - mission_specifications.phases[phase][4]
-        square_velocity_difference = mission_specifications.phases[phase][0] ** 2 - initial_velocity ** 2
+        initial_velocity = phase[0] - phase[4]
+        square_velocity_difference = phase[0] ** 2 - initial_velocity ** 2
         return (mission_specifications.takeoff_weight_guess / 2) * square_velocity_difference
 
     def calculate_potential_delta(self, mission_specifications, phase):
-        altitude_delta = mission_specifications.phases[phase][2] * mission_specifications.phases[phase][3]
+        altitude_delta = phase[2] * phase[3]
         return 9.80665 * mission_specifications.takeoff_weight_guess * altitude_delta
 
     def calculate_aerodynamic_power(self, mission_specifications, phase):
         maximum_speed = self.calculate_maximum_speed(mission_specifications, phase)
         weight = 9.80665 * mission_specifications.takeoff_weight_guess
-        return weight * maximum_speed / mission_specifications.phases[phase][1]
+        return weight * maximum_speed / phase[1]
 
-    def calculate_maximum_speed(self, mission_specifications, phase):
-        final_speed = mission_specifications.phases[phase][0]
-        initial_speed = final_speed - mission_specifications.phases[phase][4]
+    def calculate_maximum_speed(self, phase):
+        final_speed = phase[0]
+        initial_speed = final_speed - phase[4]
         if final_speed == initial_speed:
             return final_speed
         else:
             return max(final_speed, initial_speed)
 
 
-class MotorSpecifications:
+class Motor:
     """ User inputs specifications for the electric motor chosen. """
 
     def __init__(self, input_voltage, whole_chain_efficiency, max_continuous_power):
@@ -107,7 +105,7 @@ class MotorSpecifications:
         self.max_continuous_power = max_continuous_power
 
 
-class BatterySpecifications:
+class Battery:
     """ User inputs specifications for the battery chemistry chosen. """
 
     def __init__(self, nominal_cell_voltage, c_max, cell_capacity, specific_energy_density):
@@ -168,9 +166,11 @@ class TakeoffWeight:
         return
 
 
-droan_mission = MissionSpecifications(1, 30, 'endurance', 22, 120, 120, 2.54, 75, 7, 12.5)
-droan_power = MaximumPower(droan_mission)
-droan_motor = MotorSpecifications(11.1, 0.8, 110)
-droan_battery = BatterySpecifications(3.7, 25, 0.5, 200)
-droan_battery_pack_mass = BatteryPackMass(droan_power, droan_motor, droan_mission, droan_battery).battery_pack_mass
+droan_mission = Mission(1, None, 30, 'endurance', 22, 120, 120, 2.54, 75, 7, 12.5)
+droan_power_per_phase = MaximumPower(droan_mission)
+print(droan_power_per_phase.maximum_power)
+droan_motor = Motor(11.1, 0.8, 110)
+droan_battery = Battery(3.7, 25, 0.5, 200)
+droan_battery_pack_mass = BatteryPackMass(droan_power_per_phase, droan_motor, droan_mission,
+                                          droan_battery).battery_pack_mass
 print(droan_battery_pack_mass)
