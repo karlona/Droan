@@ -59,7 +59,8 @@ class Battery:
 
 
 class PhasePower:
-    """ Determine the mission phase that has the maximum power requirements."""
+    """ Calculate maximum power required for each phase. This seems like a large function lol, but whatever. We'll
+    talk about next time we talk."""
 
     def __init__(self, mission):
         [self.calculate_power(phase, mission.takeoff_weight_guess) for phase in mission.unique_phases]
