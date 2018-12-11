@@ -17,12 +17,16 @@ class MissionSpecifications:
 
         # Create Class Variables
         self.payload = payload
+        # I think it is bad programming practice to have an input variable that can be two different
+        # things, and to have class variables that may or may not exist depending on the inputs.
+        # I would just create separate variables, both for arguments and for class variables, and fill
+        # one in and have the other one be 'null' or -1 or something.
         if length_type == 'range':
             self.range = length
         elif length_type == 'endurance':
             self.endurance = length
         else:
-            raise NameError('Length type {} not found.  Accepted length types are \'range\' and \'endurance.\'')
+            raise NameError('Length type not found.  Accepted length types are \'range\' and \'endurance.\'')
         self.speed_cruise = speed
         self.altitude_cruise = altitude
         self.field_length = runway
