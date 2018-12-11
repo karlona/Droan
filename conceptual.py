@@ -114,6 +114,8 @@ class PhasePower:
         else:
             return max(final_speed, initial_speed)
 
+# Still need to modify BatteryPackMass based on our conversation on 11 Dec 2018
+
 
 class BatteryPackMass:
     """ The aircraft battery is sized to execute the provided mission with appropriate power and capacity. """
