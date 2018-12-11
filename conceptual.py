@@ -5,7 +5,13 @@ class Phase:
     """ This class details the various phases associated with the mission. """
 
     def __init__(self, final_speed, lift_over_drag, time, vertical_speed, speed_change):
-        """final_speed in m/s, lift_over_drag no units, time in seconds, vertical_speed in m/s, speed_change in m/s. """
+        """
+        final_speed in m/s
+        lift_over_drag no units
+        time in seconds
+        vertical_speed in m/s
+        speed_change in m/s
+        """
         self.final_speed = final_speed
         self.lift_over_drag = lift_over_drag
         self.time = time
@@ -42,6 +48,11 @@ class Motor:
     """ User inputs specifications for the electric motor chosen. """
 
     def __init__(self, input_voltage, whole_chain_efficiency, max_continuous_power):
+        """
+        input_voltage in volts
+        whole chain efficiency no units as a decimal less than or equal to 1 and greater than 0
+        max_continuous_power in watts
+        """
         self.input_voltage = input_voltage
         self.whole_chain_efficiency = whole_chain_efficiency
         self.max_continuous_power = max_continuous_power
@@ -51,6 +62,12 @@ class Battery:
     """ User inputs specifications for the battery chemistry chosen. """
 
     def __init__(self, nominal_cell_voltage, c_max, cell_capacity, specific_energy_density):
+        """
+        nominal_cell_voltage in volts
+        c_max no units
+        cell_capacity in ampere hours
+        specific_energy_density in watt hours per kilogram
+        """
         self.nominal_cell_voltage = nominal_cell_voltage
         self.c_max = c_max
         self.cell_capacity = cell_capacity
@@ -154,7 +171,7 @@ droan_mission = Mission(12.5)
 droan_mission.compile_unique_phases([taxi, takeoff, climb, endurance, descent, pattern, land])
 droan_mission.add_all_phases([taxi, takeoff, climb, endurance, descent, pattern, land, taxi])
 droan_power_per_phase = PhasePower(droan_mission)
-print(droan_power_per_phase.maximum_power)
+print(droan_mission.maximum_power)
 droan_motor = Motor(11.1, 0.8, 110)
 droan_battery = Battery(3.7, 25, 0.5, 200)
 droan_battery_pack_mass = BatteryPackMass(droan_power_per_phase, droan_motor, droan_mission,
