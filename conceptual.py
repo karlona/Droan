@@ -11,16 +11,31 @@ class Phase:
         self.time = time
         self.vertical_speed = vertical_speed
         self.speed_change = speed_change
+        self.maximum_power = None
+
+    def add_maximum_power(self, power):
+        self.maximum_power = power
 
 
 class Mission:
     """ All the phases are combined into a mission. """
 
-    def __init__(self):
-        self.phases = []
+    def __init__(self, takeoff_weight_guess):
+        self.all_phases = []
+        self.unique_phases = []
+        self.takeoff_weight_guess = takeoff_weight_guess
+        self.maximum_power = None
 
-    def add_phases(self, phases):
-        [self.phases.append(phase) for phase in phases]
+    def add_all_phases(self, phases):
+        [self.all_phases.append(phase) for phase in phases]
+
+    def compile_unique_phases(self, phases):
+        [self.unique_phases.append(phase) for phase in phases]
+
+    def add_maximum_power(self):
+        power = []
+        [power.append(phase.maximum_power) for phase in self.unique_phases]
+        self.maximum_power = max(power)
 
 
 class Motor:
@@ -44,41 +59,38 @@ class Battery:
 
 
 class PhasePower:
-    """ Complete
-    Determine the mission phase that has the maximum power requirements."""
+    """ Determine the mission phase that has the maximum power requirements."""
 
     def __init__(self, mission):
-        self.power_mission_phase = [self.calculate_power(mission, phase) for phase in mission.phases]
-        print("Maximum total power output in watts needed at each phase.")
-        print(self.power_mission_phase)
-        self.maximum_power = max(self.power_mission_phase)
+        [self.calculate_power(phase, mission.takeoff_weight_guess) for phase in mission.unique_phases]
+        mission.add_maximum_power()
 
-    def calculate_power(self, mission, phase):
-        return self.calculate_energy_delta_power(mission, phase) + self.calculate_aerodynamic_power(mission, phase)
+    def calculate_power(self, phase, mass):
+        power = self.calculate_energy_delta_power(phase, mass) \
+                + self.calculate_aerodynamic_power(phase.final_speed, phase.speed_change, phase.lift_over_drag, mass)
+        phase.add_maximum_power(power)
 
-    def calculate_energy_delta_power(self, mission, phase):
-        total_energy_delta = self.calculate_kinetic_delta(mission, phase) \
-                             + self.calculate_potential_delta(mission, phase)
-        phase_time = phase[2]
-        return total_energy_delta / phase_time
+    def calculate_energy_delta_power(self, phase, mass):
+        total_energy_delta = self.calculate_kinetic_delta(phase.final_speed, phase.speed_change, mass) \
+                             + self.calculate_potential_delta(phase.time, phase.vertical_speed, mass)
+        return total_energy_delta / phase.time
 
-    def calculate_kinetic_delta(self, mission, phase):
-        initial_velocity = phase[0] - phase[4]
-        square_velocity_difference = phase[0] ** 2 - initial_velocity ** 2
-        return (mission.takeoff_weight_guess / 2) * square_velocity_difference
+    def calculate_kinetic_delta(self, final_speed, speed_change, mass):
+        initial_velocity = final_speed - speed_change
+        square_velocity_difference = final_speed ** 2 - initial_velocity ** 2
+        return (mass / 2) * square_velocity_difference
 
-    def calculate_potential_delta(self, mission, phase):
-        altitude_delta = phase[2] * phase[3]
-        return 9.80665 * mission.takeoff_weight_guess * altitude_delta
+    def calculate_potential_delta(self, time, vertical_speed, mass):
+        altitude_delta = time * vertical_speed
+        return 9.80665 * mass * altitude_delta
 
-    def calculate_aerodynamic_power(self, mission, phase):
-        maximum_speed = self.calculate_maximum_speed(phase)
-        weight = 9.80665 * mission.takeoff_weight_guess
-        return weight * maximum_speed / phase[1]
+    def calculate_aerodynamic_power(self, final_speed, speed_change, lift_over_drag, mass):
+        maximum_speed = self.calculate_maximum_speed(final_speed, speed_change)
+        weight = 9.80665 * mass
+        return weight * maximum_speed / lift_over_drag
 
-    def calculate_maximum_speed(self, phase):
-        final_speed = phase[0]
-        initial_speed = final_speed - phase[4]
+    def calculate_maximum_speed(self, final_speed, speed_change):
+        initial_speed = final_speed - speed_change
         if final_speed == initial_speed:
             return final_speed
         else:
@@ -86,18 +98,17 @@ class PhasePower:
 
 
 class BatteryPackMass:
-    """ Complete
-    The aircraft battery is sized to execute the provided mission with appropriate power and capacity. """
+    """ The aircraft battery is sized to execute the provided mission with appropriate power and capacity. """
 
     def __init__(self, maximum_power, motor, mission, battery):
-        self.number_in_series = self.size_number_in_series(motor, battery)
+        self.number_in_series = self.size_number_in_series(motor.input_voltage, battery.nominal_cell_voltage)
         self.number_in_parallel = self.size_number_in_parallel(maximum_power, battery,
                                                                motor, mission)
         self.number_of_cells = self.number_in_series * self.number_in_parallel
         self.battery_pack_mass = self.number_of_cells * battery.battery_cell_mass
 
-    def size_number_in_series(self, motor, battery):
-        return math.ceil(motor.input_voltage / battery.nominal_cell_voltage)
+    def size_number_in_series(self, input_voltage, nominal_cell_voltage):
+        return math.ceil(input_voltage / nominal_cell_voltage)
 
     def size_number_in_parallel(self, phase_power, battery, motor, mission):
         power = self.size_parallel_for_power(phase_power, battery, motor)
@@ -137,8 +148,10 @@ endurance = Phase(22.4, 20, 1800, 0, 0)
 descent = Phase(13.4, 15, 48, -2.54, -9)
 pattern = Phase(13.4, 10, 60, 0, 0)
 land = Phase(0, 5, 15, -1, -13.4)
-droan_mission = Mission()
-droan_mission.add_phases([taxi, takeoff, climb, endurance, descent, pattern, land, taxi])
+droan_mission = Mission(12.5)
+# I feel like compile_unique_phases could be automated fairly easily
+droan_mission.compile_unique_phases([taxi, takeoff, climb, endurance, descent, pattern, land])
+droan_mission.add_all_phases([taxi, takeoff, climb, endurance, descent, pattern, land, taxi])
 droan_power_per_phase = PhasePower(droan_mission)
 print(droan_power_per_phase.maximum_power)
 droan_motor = Motor(11.1, 0.8, 110)
