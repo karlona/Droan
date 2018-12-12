@@ -88,7 +88,10 @@ class PhasePower:
     def calculate_power(self, phase, mass):
         power = self.calculate_energy_delta_power(phase, mass) \
                 + self.calculate_aerodynamic_power(phase.final_speed, phase.speed_change, phase.lift_over_drag, mass)
-        phase.add_maximum_power(power)
+        if power > 0:  # Assuming that energy recovery is not an option
+            phase.add_maximum_power(power)
+        else:
+            phase.add_maximum_power(0)
 
     def calculate_energy_delta_power(self, phase, mass):
         total_energy_delta = self.calculate_kinetic_delta(phase.final_speed, phase.speed_change, mass) \
@@ -178,7 +181,7 @@ droan_power_per_phase = PhasePower(droan_mission)
 print([math.ceil(phase.maximum_power) for phase in droan_mission.unique_phases])
 print("Maximum mission power is " + str(math.ceil(droan_mission.maximum_power)) + " watts.")
 droan_motor = Motor(11.1, 0.8, 110)
-droan_battery = Battery(11.1, 1, 2.2, 140)  # Gens ace 25C 2200mah 11.1V 3S Lipo Battery
+droan_battery = Battery(11.1, 25, 2.2, 140)  # Gens ace 25C 2200mah 11.1V 3S Lipo Battery
 print("Each battery has a mass of " + str(droan_battery.battery_cell_mass) + " kilograms")
 droan_battery_pack_mass = BatteryPackMass(droan_motor, droan_mission, droan_battery).battery_pack_mass
 print("Total battery pack mass is " + str(droan_battery_pack_mass) + " kilograms")
