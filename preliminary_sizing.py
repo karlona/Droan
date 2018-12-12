@@ -162,6 +162,8 @@ class BatteryPackMass:
                                                                * battery_pack_voltage))
         return math.ceil(max_power / (c_max * cell_capacity * efficiency * battery_pack_voltage))
 
+    #  Everything above is ready to be reviewed for cohesion and verified as clean code
+
 
 class EmptyWeight:
     def __init__(self):
