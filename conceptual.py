@@ -47,7 +47,6 @@ class Mission:
                 self.unique_phases.remove(specific_phase)
             else:
                 pass
-        #  [self.unique_phases.append(phase) for phase in phases]
 
     def add_maximum_power(self):
         power = []
