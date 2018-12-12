@@ -41,12 +41,11 @@ class Mission:
         self.compile_unique_phases()
 
     def compile_unique_phases(self):  # Unsure how to not use a for loop here
-        self.unique_phases = self.all_phases
-        for specific_phase in self.unique_phases:
-            if self.unique_phases.count(specific_phase) > 1:
-                self.unique_phases.remove(specific_phase)
-            else:
+        for specific_phase in self.all_phases:
+            if self.unique_phases.count(specific_phase) >= 1:
                 pass
+            else:
+                self.unique_phases.append(specific_phase)
 
     def add_maximum_power(self):
         power = []
