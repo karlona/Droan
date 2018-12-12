@@ -1,4 +1,4 @@
-from conceptual import *
+from preliminary_sizing import *
 
 taxi = Phase("taxi", 3, 15, 30, 0, 3)
 takeoff = Phase("takeoff", 13.4, 15, 10, 0, 13.4)
