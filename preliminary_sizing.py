@@ -164,6 +164,13 @@ class BatteryPackMass:
 
     #  Everything above is ready to be reviewed for cohesion and verified as clean code
 
+class SimilarPlane:
+    """ Similar planes to plane being designed."""
+
+    def __init__(self, takeoff_mass, empty_mass):
+        self.takeoff_mass = takeoff_mass
+        self.empty_mass = empty_mass
+
 
 class EmptyWeight:
     def __init__(self):
