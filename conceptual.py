@@ -71,7 +71,7 @@ class Battery:
         specific_energy_density in watt hours per kilogram
         """
         self.nominal_cell_voltage = nominal_cell_voltage
-        self.c_max = c_max
+        self.c_max = c_max / 3600  # Convert 1/hours to 1/seconds
         self.cell_capacity = cell_capacity * 3600  # Convert ampere hours to ampere seconds
         self.specific_energy_density = specific_energy_density * 3600  # Convert W-h/kg to W-s/kg
         self.battery_cell_mass = self.cell_capacity * self.nominal_cell_voltage / self.specific_energy_density
@@ -178,7 +178,7 @@ droan_power_per_phase = PhasePower(droan_mission)
 print([math.ceil(phase.maximum_power) for phase in droan_mission.unique_phases])
 print("Maximum mission power is " + str(math.ceil(droan_mission.maximum_power)) + " watts.")
 droan_motor = Motor(11.1, 0.8, 110)
-droan_battery = Battery(11.1, 25, 2.2, 140)  # Gens ace 25C 2200mah 11.1V 3S Lipo Battery
+droan_battery = Battery(11.1, 1, 2.2, 140)  # Gens ace 25C 2200mah 11.1V 3S Lipo Battery
 print("Each battery has a mass of " + str(droan_battery.battery_cell_mass) + " kilograms")
 droan_battery_pack_mass = BatteryPackMass(droan_motor, droan_mission, droan_battery).battery_pack_mass
 print("Total battery pack mass is " + str(droan_battery_pack_mass) + " kilograms")
