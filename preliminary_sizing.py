@@ -164,6 +164,7 @@ class BatteryPackMass:
 
     #  Everything above is ready to be reviewed for cohesion and verified as clean code
 
+
 class SimilarPlane:
     """ Similar planes to plane being designed."""
 
@@ -172,11 +173,32 @@ class SimilarPlane:
         self.empty_mass = empty_mass
 
 
-class EmptyWeight:
+class HistoricalTrend:
+    """ Input similar planes, calculate trend data, and predict empty mass of aircraft to be designed."""
+
+    def __init__(self):
+        self.similar_planes = []
+        self.trend_slope = None
+        self.trend_y_intercept = None
+
+    def add_similar_planes(self, similar_planes):
+        [self.similar_planes.append(plane) for plane in similar_planes]
+
+    def calculate_trend_slope(self):
+        return
+
+    def calculate_trend_y_intercept(self):
+        return
+
+    def estimate_empty_weight(self):
+        return
+
+
+class EmptyMass:
     def __init__(self):
         return
 
 
-class TakeoffWeight:
+class TakeoffMass:
     def __init__(self):
         return
