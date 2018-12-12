@@ -19,4 +19,4 @@ droan_motor = Motor(11.1, 0.8, 110)
 droan_battery = Battery(11.1, 25, 2.2, 140)  # Gens ace 25C 2200mah 11.1V 3S Lipo Battery
 print("Each battery has a mass of " + str(droan_battery.battery_cell_mass) + " kilograms")
 droan_battery_pack_mass = BatteryPackMass(droan_motor, droan_mission, droan_battery).battery_pack_mass
-print("Total battery pack mass is " + str(droan_battery_pack_mass) + " kilograms")
+print("Total battery pack mass is " + str(round(droan_battery_pack_mass, 3)) + " kilograms")
