@@ -14,9 +14,14 @@ droan_battery = Battery(11.1, 25, 2.2, 140)  # Gens ace 25C 2200mah 11.1V 3S Lip
 
 droan_mission.add_all_phases([taxi, takeoff, climb, endurance, descent, pattern, land, taxi])
 droan_power_per_phase = PhasePower(droan_mission)
+droan_battery_pack = BatteryPackMass(droan_motor, droan_mission, droan_battery)
 droan_battery_pack_mass = BatteryPackMass(droan_motor, droan_mission, droan_battery).battery_pack_mass
 
-print([math.ceil(phase.maximum_power) for phase in droan_mission.unique_phases])
+print("Power at each phase is " + str([math.ceil(phase.maximum_power) for phase in droan_mission.unique_phases]))
 print("Maximum mission power is " + str(math.ceil(droan_mission.maximum_power)) + " watts.")
+print(str(droan_battery_pack.number_in_series) + " batteries in series.")
+print(str(droan_battery_pack.number_in_parallel_endurance) + " batteries in parallel for endurance.")
+print(str(droan_battery_pack.number_in_parallel_power) + " batteries in parallel for power.")
+print(str(droan_battery_pack.number_in_parallel) + " batteries in parallel.")
 print("Each battery has a mass of " + str(round(droan_battery.battery_cell_mass, 3)) + " kilograms")
 print("Total battery pack mass is " + str(round(droan_battery_pack_mass, 3)) + " kilograms")

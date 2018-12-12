@@ -32,7 +32,7 @@ class Mission:
         self.all_phases = []
         self.unique_phases = []
         self.takeoff_weight_guess = takeoff_weight_guess
-        # Lowest voltage ratio at which you still want to execute max power, i.e. 0.8 is 80% of full charge voltage
+        # Lowest voltage ratio at which you still want to execute max power, i.e. 0.8 is 80% of full charge !voltage!
         self.lowest_voltage_maximum_power_ratio = 0.8
         self.maximum_power = None
 
@@ -133,6 +133,8 @@ class BatteryPackMass:
 
     def __init__(self, motor, mission, battery):
         self.number_in_series = self.size_number_in_series(motor.input_voltage, battery.nominal_cell_voltage)
+        self.number_in_parallel_power = None
+        self.number_in_parallel_endurance = None
         self.number_in_parallel = self.size_number_in_parallel(battery, motor.whole_chain_efficiency,
                                                                mission.all_phases, mission.maximum_power,
                                                                mission.lowest_voltage_maximum_power_ratio)
@@ -140,7 +142,6 @@ class BatteryPackMass:
         self.battery_pack_mass = self.number_of_cells * battery.battery_cell_mass
 
     def size_number_in_series(self, input_voltage, nominal_cell_voltage):
-        print(str(math.ceil(input_voltage / nominal_cell_voltage)) + " batteries in series.")
         return math.ceil(input_voltage / nominal_cell_voltage)
 
     def size_number_in_parallel(self, battery, efficiency, all_phases, max_power, low_voltage_ratio):
@@ -148,19 +149,18 @@ class BatteryPackMass:
                                                       battery.c_max, battery.cell_capacity, low_voltage_ratio)
         parallel_endurance = self.size_parallel_for_endurance(battery.nominal_cell_voltage, battery.cell_capacity,
                                                               efficiency, all_phases)
-        print(str(math.ceil(max(parallel_power, parallel_endurance))) + " batteries in parallel.")
         return math.ceil(max(parallel_power, parallel_endurance))
 
     def size_parallel_for_endurance(self, cell_voltage, cell_capacity, efficiency, phases):
         phase_energy = [specific_phase.maximum_power * specific_phase.time for specific_phase in phases]
         cell_energy_capacity = cell_voltage * cell_capacity * efficiency
-        print(str(math.ceil(sum(phase_energy) / cell_energy_capacity)) + " batteries in endurance parallel")
+        self.number_in_parallel_endurance = math.ceil(sum(phase_energy) / cell_energy_capacity)
         return math.ceil(sum(phase_energy) / cell_energy_capacity)
 
     def size_parallel_for_power(self, max_power, cell_voltage, efficiency, c_max, cell_capacity, low_voltage_ratio):
         battery_pack_voltage = self.number_in_series * cell_voltage * low_voltage_ratio
-        print(str(math.ceil(max_power / (c_max * cell_capacity * efficiency * battery_pack_voltage)))
-              + " batteries in power parallel")
+        self.number_in_parallel_power = math.ceil(max_power / (c_max * cell_capacity * efficiency
+                                                               * battery_pack_voltage))
         return math.ceil(max_power / (c_max * cell_capacity * efficiency * battery_pack_voltage))
 
 
