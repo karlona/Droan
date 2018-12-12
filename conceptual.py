@@ -4,14 +4,16 @@ import math
 class Phase:
     """ This class details the various phases associated with the mission. """
 
-    def __init__(self, final_speed, lift_over_drag, time, vertical_speed, speed_change):
+    def __init__(self, name, final_speed, lift_over_drag, time, vertical_speed, speed_change):
         """
+        name is a string naming the mission phase
         final_speed in m/s
         lift_over_drag no units
         time in seconds
         vertical_speed in m/s
         speed_change in m/s
         """
+        self.name = name
         self.final_speed = final_speed
         self.lift_over_drag = lift_over_drag
         self.time = time
@@ -36,9 +38,16 @@ class Mission:
 
     def add_all_phases(self, phases):
         [self.all_phases.append(phase) for phase in phases]
+        self.compile_unique_phases()
 
-    def compile_unique_phases(self, phases):
-        [self.unique_phases.append(phase) for phase in phases]
+    def compile_unique_phases(self):  # Unsure how to not use a for loop here
+        self.unique_phases = self.all_phases
+        for specific_phase in self.unique_phases:
+            if self.unique_phases.count(specific_phase) > 1:
+                self.unique_phases.remove(specific_phase)
+            else:
+                pass
+        #  [self.unique_phases.append(phase) for phase in phases]
 
     def add_maximum_power(self):
         power = []
