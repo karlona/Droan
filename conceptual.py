@@ -31,7 +31,7 @@ class Mission:
         self.unique_phases = []
         self.takeoff_weight_guess = takeoff_weight_guess
         # Lowest voltage ratio at which you still want to execute max power, i.e. 0.8 is 80% of full charge voltage
-        self.lowest_voltage_maximum_power_ratio = 0.75
+        self.lowest_voltage_maximum_power_ratio = 0.8
         self.maximum_power = None
 
     def add_all_phases(self, phases):
@@ -66,7 +66,7 @@ class Battery:
     def __init__(self, nominal_cell_voltage, c_max, cell_capacity, specific_energy_density):
         """
         nominal_cell_voltage in volts
-        c_max no units
+        c_max in Amps per Amp - hour (current / battery capacity)
         cell_capacity in ampere hours
         specific_energy_density in watt hours per kilogram
         """
@@ -175,7 +175,8 @@ droan_mission = Mission(12.5)
 droan_mission.compile_unique_phases([taxi, takeoff, climb, endurance, descent, pattern, land])
 droan_mission.add_all_phases([taxi, takeoff, climb, endurance, descent, pattern, land, taxi])
 droan_power_per_phase = PhasePower(droan_mission)
-print([phase.maximum_power for phase in droan_mission.unique_phases])
+print([math.ceil(phase.maximum_power) for phase in droan_mission.unique_phases])
+print("Maximum mission power is " + str(math.ceil(droan_mission.maximum_power)) + " watts.")
 droan_motor = Motor(11.1, 0.8, 110)
 droan_battery = Battery(11.1, 25, 2.2, 140)  # Gens ace 25C 2200mah 11.1V 3S Lipo Battery
 print("Each battery has a mass of " + str(droan_battery.battery_cell_mass) + " kilograms")
