@@ -43,6 +43,11 @@ droan_touch_and_go_mission.add_all_phases([taxi, takeoff, pattern_climb, touch_a
                                            takeoff, pattern_climb, touch_and_go_pattern, land,
                                            takeoff, pattern_climb, touch_and_go_pattern, land,
                                            takeoff, pattern_climb, touch_and_go_pattern, land,
+                                           takeoff, pattern_climb, touch_and_go_pattern, land,
+                                           takeoff, pattern_climb, touch_and_go_pattern, land,
+                                           takeoff, pattern_climb, touch_and_go_pattern, land,
+                                           takeoff, pattern_climb, touch_and_go_pattern, land,
+                                           takeoff, pattern_climb, touch_and_go_pattern, land,
                                            takeoff, pattern_climb, touch_and_go_pattern, land, taxi])
 droan_power_per_phase_touch_and_go = PhasePower(droan_touch_and_go_mission)
 droan_battery_pack_touch_and_go = BatteryPackMass(droan_motor, droan_touch_and_go_mission, droan_battery)
