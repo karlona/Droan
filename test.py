@@ -7,6 +7,7 @@ endurance = Phase("endurance", 22.4, 20, 1800, 0, 0)
 descent = Phase("descent", 13.4, 15, 48, -2.54, -9)
 pattern = Phase("pattern", 13.4, 10, 60, 0, 0)
 land = Phase("land", 0, 5, 30, -1, -13.4)
+land_duplicate = Phase("land", 0, 5, 30, -1, -13.4)
 
 droan_endurance_mission = Mission(12.5)
 droan_motor = Motor(11.1, 0.8, 110)
@@ -73,4 +74,10 @@ print(str(droan_battery_pack_touch_and_go.number_in_parallel_power) + " batterie
 print(str(droan_battery_pack_touch_and_go.number_in_parallel) + " batteries in parallel.")
 print(str(droan_battery_pack_touch_and_go.number_of_cells) + " total batteries.")
 print("Each battery has a mass of " + str(round(droan_battery.battery_cell_mass, 3)) + " kilograms")
+#Check out these two print lines, copies of above - I think these are easier than doing "+" and I prefer the first one
+#Use these techniques to fix the line in the for loop above (was line 21 as of this writing)
+print("Each battery has a mass of {} kilograms".format(str(round(droan_battery.battery_cell_mass, 3))))
+print("Each battery has a mass of %s kilograms" % str(round(droan_battery.battery_cell_mass, 3)))
 print("Total battery pack mass is " + str(round(droan_battery_pack_mass_touch_and_go, 3)) + " kilograms")
+#Check out this line as well - this is why you need the __str__ method for Phase
+print(*droan_endurance_mission.unique_phases, sep = "\n")

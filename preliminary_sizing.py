@@ -24,6 +24,15 @@ class Phase:
     def add_maximum_power(self, power):
         self.maximum_power = power
 
+    #This I added so that you can easily print phases - you can see this in test.
+    def __str__(self):
+        return "Name: {},  Final Speed: {},  LoD: {},  Time: {},  Vert Speed: {},  Speed Change: {},  Max Power: {}" \
+               "".format(self.name, self.final_speed, self.lift_over_drag, self.time, self.vertical_speed,
+                         self.speed_change, self.maximum_power)
+
+    #This is so Mission.compile_unique_phases actually works
+    def __eq__(self, other):
+        return self.__dict__ == other.__dict__
 
 class Mission:
     """ All the phases are combined into a mission. """
@@ -41,11 +50,12 @@ class Mission:
         self.compile_unique_phases()
 
     def compile_unique_phases(self):  # Unsure how to not use a for loop here
-        for specific_phase in self.all_phases:
-            if self.unique_phases.count(specific_phase) >= 1:
-                pass
-            else:
-                self.unique_phases.append(specific_phase)
+        [self.unique_phases.append(phase) for phase in self.all_phases if phase not in self.unique_phases]
+        # for specific_phase in self.all_phases:
+        #     if self.unique_phases.count(specific_phase) >= 1:
+        #         pass
+        #     else:
+        #         self.unique_phases.append(specific_phase)
 
     def add_maximum_power(self):
         power = []
