@@ -171,10 +171,12 @@ class SimilarPlane:
     def __init__(self, takeoff_mass, empty_mass):
         self.takeoff_mass = takeoff_mass
         self.empty_mass = empty_mass
+        self.log_takeoff_mass = math.log10(takeoff_mass)
+        self.log_empty_mass = math.log10(empty_mass)
 
 
 class HistoricalTrend:
-    """ Input similar planes, calculate trend data, and predict empty mass of aircraft to be designed."""
+    """ Calculate trend data in order to predict empty mass of aircraft to be designed."""
 
     def __init__(self):
         self.similar_planes = []
@@ -184,14 +186,44 @@ class HistoricalTrend:
     def add_similar_planes(self, similar_planes):
         [self.similar_planes.append(plane) for plane in similar_planes]
 
-    def calculate_trend_slope(self):
-        return
+    def estimate_empty_mass(self, takeoff_mass_guess):
+        errors = self.populate_errors()
+        squared_errors = self.calculate_squared_errors(errors)
+        y_intercept_derivative = self.calculate_y_intercept_derivative(squared_errors)
+        slope_derivative = self.calculate_slope_derivative(squared_errors)
+        self.calculate_slope_and_y_intercept(y_intercept_derivative, slope_derivative)
+        return 10 ** (math.log10(takeoff_mass_guess) * self.trend_slope + self.trend_y_intercept)
 
-    def calculate_trend_y_intercept(self):
-        return
+    def populate_errors(self):
+        errors = []
+        return [errors.append([plane.log_empty_mass, -1, -1 * plane.log_takeoff_mass]) for plane in self.similar_planes]
 
-    def estimate_empty_weight(self):
-        return
+    def calculate_squared_errors(self, populated_errors):
+        not_summed = []
+        [not_summed.append([1, error[2] ** 2, 2 * error[1] * error[2], 2 * error[0] * error[1],
+                            2 * error[0] * error[2], error[0] ** 2]) for error in populated_errors]
+        squared_errors = []
+        for i in range(6):
+            summation = 0
+            for j in range(len(not_summed)):
+                summation += not_summed[j][i]
+            squared_errors.append(summation)
+        return squared_errors
+
+    def calculate_y_intercept_derivative(self, squared_errors):
+        return [2 * squared_errors[0], squared_errors[2], squared_errors[3]]
+
+    def calculate_slope_derivative(self, squared_errors):
+        return [squared_errors[2], 2 * squared_errors[1], squared_errors[4]]
+
+    def calculate_slope_and_y_intercept(self, y_intercept_derivative, slope_derivative):
+        a = [[y_intercept_derivative[0], y_intercept_derivative[1]], [slope_derivative[0], slope_derivative[1]]]
+        b = [[-1 * y_intercept_derivative[2]], [-1 * slope_derivative]]
+        a_determinant = 1 / (a[0][0] * a[1][1] - a[0][1] * a[1][0])
+        a_inverse = [[a_determinant * a[1][1], -1 * a_determinant * a[0][1]],
+                     [-1 * a_determinant * a[1][0], a_determinant * a[0][0]]]
+        self.trend_y_intercept = a_inverse[0][0] * b[0] + a_inverse[0][1] * b[1]
+        self.trend_slope = a_inverse[1][0] * b[0] + a_inverse[1][1] * b[1]
 
 
 class EmptyMass:
