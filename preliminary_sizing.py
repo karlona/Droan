@@ -192,6 +192,7 @@ class HistoricalTrend:
         self.similar_planes = []
         self.trend_slope = None
         self.trend_y_intercept = None
+        self.empty_mass_guess = None
 
     def add_similar_planes(self, similar_planes):
         [self.similar_planes.append(plane) for plane in similar_planes]
@@ -202,7 +203,8 @@ class HistoricalTrend:
         y_intercept_derivative = self.calculate_y_intercept_derivative(squared_errors)
         slope_derivative = self.calculate_slope_derivative(squared_errors)
         self.calculate_slope_and_y_intercept(y_intercept_derivative, slope_derivative)
-        return 10 ** (math.log10(takeoff_mass_guess) * self.trend_slope + self.trend_y_intercept)
+        self.empty_mass_guess = 10 ** (math.log10(takeoff_mass_guess) * self.trend_slope + self.trend_y_intercept)
+        return self.empty_mass_guess
 
     def populate_errors(self):
         errors = []
