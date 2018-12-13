@@ -196,7 +196,8 @@ class HistoricalTrend:
 
     def populate_errors(self):
         errors = []
-        return [errors.append([plane.log_empty_mass, -1, -1 * plane.log_takeoff_mass]) for plane in self.similar_planes]
+        [errors.append([plane.log_empty_mass, -1, -1 * plane.log_takeoff_mass]) for plane in self.similar_planes]
+        return errors
 
     def calculate_squared_errors(self, populated_errors):
         not_summed = []
@@ -218,12 +219,12 @@ class HistoricalTrend:
 
     def calculate_slope_and_y_intercept(self, y_intercept_derivative, slope_derivative):
         a = [[y_intercept_derivative[0], y_intercept_derivative[1]], [slope_derivative[0], slope_derivative[1]]]
-        b = [[-1 * y_intercept_derivative[2]], [-1 * slope_derivative]]
+        b = [[-1 * y_intercept_derivative[2]], [-1 * slope_derivative[2]]]
         a_determinant = 1 / (a[0][0] * a[1][1] - a[0][1] * a[1][0])
         a_inverse = [[a_determinant * a[1][1], -1 * a_determinant * a[0][1]],
                      [-1 * a_determinant * a[1][0], a_determinant * a[0][0]]]
-        self.trend_y_intercept = a_inverse[0][0] * b[0] + a_inverse[0][1] * b[1]
-        self.trend_slope = a_inverse[1][0] * b[0] + a_inverse[1][1] * b[1]
+        self.trend_y_intercept = a_inverse[0][0] * b[0][0] + a_inverse[0][1] * b[1][0]
+        self.trend_slope = a_inverse[1][0] * b[0][0] + a_inverse[1][1] * b[1][0]
 
 
 class EmptyMass:

@@ -28,6 +28,16 @@ print(str(droan_battery_pack.number_of_cells) + " total batteries.")
 print("Each battery has a mass of " + str(round(droan_battery.battery_cell_mass, 3)) + " kilograms")
 print("Total battery pack mass is " + str(round(droan_battery_pack_mass, 3)) + " kilograms")
 
+a = SimilarPlane(1, 6)
+b = SimilarPlane(2, 5)
+c = SimilarPlane(3, 7)
+d = SimilarPlane(4, 10)
+wiki_example = HistoricalTrend()
+wiki_example.add_similar_planes([a, b, c, d])
+e = wiki_example.estimate_empty_mass(1)
+print("Slope is " + str(wiki_example.trend_slope))
+print("Y Intercept is " + str(wiki_example.trend_y_intercept))
+
 print("*** New Mission Below ***")
 
 pattern_climb = Phase("pattern_climb", 13.4, 10, 12, 2.54, 0)
