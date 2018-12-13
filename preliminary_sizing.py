@@ -41,6 +41,7 @@ class Mission:
         self.all_phases = []
         self.unique_phases = []
         self.takeoff_weight_guess = takeoff_weight_guess
+        self.payload = payload
         # Lowest voltage ratio at which you still want to execute max power, i.e. 0.8 is 80% of full charge !voltage!
         self.lowest_voltage_maximum_power_ratio = 0.8
         self.maximum_power = None
@@ -239,11 +240,21 @@ class HistoricalTrend:
         self.trend_slope = a_inverse[1][0] * b[0][0] + a_inverse[1][1] * b[1][0]
 
 
-class EmptyMass:
-    def __init__(self):
+class MassIteration:
+    """ This class refines the takeoff mass guess for the mission to a point where the
+    available and required empty masses are within half a percent of one another."""
+
+    def __init__(self, mission, acceptable_error):
+        self.acceptable_error = acceptable_error
         return
 
+    def iterate_empty_mass_available(self):
+        error = (empty_mass_available - empty_mass_required) / empty_mass_required
+        if error > self.acceptable_error:
+            if empty_mass_required > empty_mass_available:
+                # move takeoff_mass_guess up
+                pass
+            else:
+                # move takeoff_mass_guess down
+                pass
 
-class TakeoffMass:
-    def __init__(self):
-        return
