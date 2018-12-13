@@ -37,7 +37,7 @@ class Phase:
 class Mission:
     """ All the phases are combined into a mission. """
 
-    def __init__(self, takeoff_weight_guess):
+    def __init__(self, takeoff_weight_guess, payload):
         self.all_phases = []
         self.unique_phases = []
         self.takeoff_weight_guess = takeoff_weight_guess
@@ -192,7 +192,7 @@ class HistoricalTrend:
         self.similar_planes = []
         self.trend_slope = None
         self.trend_y_intercept = None
-        self.empty_mass_guess = None
+        self.empty_mass_allowable = None
 
     def add_similar_planes(self, similar_planes):
         [self.similar_planes.append(plane) for plane in similar_planes]
@@ -203,8 +203,8 @@ class HistoricalTrend:
         y_intercept_derivative = self.calculate_y_intercept_derivative(squared_errors)
         slope_derivative = self.calculate_slope_derivative(squared_errors)
         self.calculate_slope_and_y_intercept(y_intercept_derivative, slope_derivative)
-        self.empty_mass_guess = 10 ** (math.log10(takeoff_mass_guess) * self.trend_slope + self.trend_y_intercept)
-        return self.empty_mass_guess
+        self.empty_mass_allowable = 10 ** (math.log10(takeoff_mass_guess) * self.trend_slope + self.trend_y_intercept)
+        return self.empty_mass_allowable
 
     def populate_errors(self):
         errors = []

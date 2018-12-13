@@ -9,7 +9,7 @@ pattern = Phase("pattern", 13.4, 10, 60, 0, 0)
 land = Phase("land", 0, 5, 30, -1, -13.4)
 land_duplicate = Phase("land", 0, 5, 30, -1, -13.4)
 
-droan_endurance_mission = Mission(12.5)
+droan_endurance_mission = Mission(12.5, 1)
 droan_motor = Motor(11.1, 0.8, 110)
 droan_battery = Battery(11.1, 25, 2.2, 140)  # Gens ace 25C 2200mah 11.1V 3S Lipo Battery
 
@@ -44,7 +44,7 @@ print("*** New Mission Below ***")
 pattern_climb = Phase("pattern_climb", 13.4, 10, 12, 2.54, 0)
 touch_and_go_pattern = Phase("touch_and_go_pattern", 13.4, 10, 60, 0, 0)
 
-droan_touch_and_go_mission = Mission(12.5)
+droan_touch_and_go_mission = Mission(12.5, 1)
 droan_touch_and_go_mission.add_all_phases([taxi, takeoff, pattern_climb, touch_and_go_pattern, land,
                                            takeoff, pattern_climb, touch_and_go_pattern, land,
                                            takeoff, pattern_climb, touch_and_go_pattern, land,

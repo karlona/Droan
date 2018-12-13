@@ -50,9 +50,7 @@ class FormalTesting(unittest.TestCase):
                                          jurca_mj_5ea2, piel_emeraude_cp320, piel_super_diamant, pottier_p50,
                                          stelio_frati_falco_f8l, nasa_gl_10])
         droan_empty_mass_guess = roskam_home_built.estimate_empty_mass(12.5)
-        print(roskam_home_built.trend_y_intercept)
-        print(roskam_home_built.trend_slope)
-        print(roskam_home_built.empty_mass_guess)
+        print(droan_empty_mass_guess)
         self.assertEqual(round(roskam_home_built.empty_mass_guess), 10)
 
 
