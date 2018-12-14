@@ -24,26 +24,26 @@ class Phase:
     def add_maximum_power(self, power):
         self.maximum_power = power
 
-    #This I added so that you can easily print phases - you can see this in test.
     def __str__(self):
         return "Name: {},  Final Speed: {},  LoD: {},  Time: {},  Vert Speed: {},  Speed Change: {},  Max Power: {}" \
                "".format(self.name, self.final_speed, self.lift_over_drag, self.time, self.vertical_speed,
                          self.speed_change, self.maximum_power)
 
-    #This is so Mission.compile_unique_phases actually works
+    #  This is so Mission.compile_unique_phases actually works
     def __eq__(self, other):
         return self.__dict__ == other.__dict__
+
 
 class Mission:
     """ All the phases are combined into a mission. """
 
-    def __init__(self, takeoff_weight_guess, payload):
+    def __init__(self, takeoff_mass_guess, payload, lowest_voltage_maximum_power_ratio=0.8):
         self.all_phases = []
         self.unique_phases = []
-        self.takeoff_weight_guess = takeoff_weight_guess
+        self.takeoff_mass_guess = takeoff_mass_guess
         self.payload = payload
         # Lowest voltage ratio at which you still want to execute max power, i.e. 0.8 is 80% of full charge !voltage!
-        self.lowest_voltage_maximum_power_ratio = 0.8
+        self.lowest_voltage_maximum_power_ratio = lowest_voltage_maximum_power_ratio
         self.maximum_power = None
 
     def add_all_phases(self, phases):
@@ -52,11 +52,6 @@ class Mission:
 
     def compile_unique_phases(self):  # Unsure how to not use a for loop here
         [self.unique_phases.append(phase) for phase in self.all_phases if phase not in self.unique_phases]
-        # for specific_phase in self.all_phases:
-        #     if self.unique_phases.count(specific_phase) >= 1:
-        #         pass
-        #     else:
-        #         self.unique_phases.append(specific_phase)
 
     def add_maximum_power(self):
         power = []
@@ -100,7 +95,7 @@ class PhasePower:
     talk about next time we talk."""
 
     def __init__(self, mission):
-        [self.calculate_power(phase, mission.takeoff_weight_guess) for phase in mission.unique_phases]
+        [self.calculate_power(phase, mission.takeoff_mass_guess) for phase in mission.unique_phases]
         mission.add_maximum_power()
 
     def calculate_power(self, phase, mass):
@@ -139,7 +134,8 @@ class PhasePower:
 
 
 class BatteryPackMass:
-    """ The aircraft battery is sized to execute the provided mission with appropriate power and capacity. """
+    """ The aircraft battery is sized to execute the provided mission with appropriate power and capacity.
+    Could this be inside of MassIteration? IDK, probably not."""
 
     def __init__(self, motor, mission, battery):
         self.number_in_series = self.size_number_in_series(motor.input_voltage, battery.nominal_cell_voltage)
@@ -187,25 +183,25 @@ class SimilarPlane:
 
 
 class HistoricalTrend:
-    """ Calculate trend data in order to predict empty mass of aircraft to be designed."""
+    """ Calculate historical trend data in order to calculate required empty mass of aircraft to be designed. """
 
     def __init__(self):
         self.similar_planes = []
         self.trend_slope = None
         self.trend_y_intercept = None
-        self.empty_mass_allowable = None
+        self.empty_mass_required = None
 
     def add_similar_planes(self, similar_planes):
         [self.similar_planes.append(plane) for plane in similar_planes]
 
-    def estimate_empty_mass(self, takeoff_mass_guess):
+    def estimate_historical_empty_mass(self, takeoff_mass_guess):
         errors = self.populate_errors()
         squared_errors = self.calculate_squared_errors(errors)
         y_intercept_derivative = self.calculate_y_intercept_derivative(squared_errors)
         slope_derivative = self.calculate_slope_derivative(squared_errors)
         self.calculate_slope_and_y_intercept(y_intercept_derivative, slope_derivative)
-        self.empty_mass_allowable = 10 ** (math.log10(takeoff_mass_guess) * self.trend_slope + self.trend_y_intercept)
-        return self.empty_mass_allowable
+        self.empty_mass_required = 10 ** (math.log10(takeoff_mass_guess) * self.trend_slope + self.trend_y_intercept)
+        return self.empty_mass_required
 
     def populate_errors(self):
         errors = []
@@ -244,17 +240,27 @@ class MassIteration:
     """ This class refines the takeoff mass guess for the mission to a point where the
     available and required empty masses are within half a percent of one another."""
 
-    def __init__(self, mission, acceptable_error):
+    def __init__(self, motor, mission, battery, historical_trend, acceptable_error=0.005):
+        self.iterated_empty_mass = None
+        self.iterated_takeoff_mass = None
         self.acceptable_error = acceptable_error
+        self.iterate_empty_mass_available(motor, mission, battery, historical_trend)
         return
 
-    def iterate_empty_mass_available(self):
+    def iterate_empty_mass_available(self, motor, mission, battery, historical_trend):
+        empty_mass_required = historical_trend.estimate_historical_empty_mass(mission.takeoff_mass_guess)
+        empty_mass_available = mission.takeoff_mass_guess - mission.payload \
+                               - BatteryPackMass(motor, mission, battery).battery_pack_mass
         error = (empty_mass_available - empty_mass_required) / empty_mass_required
         if error > self.acceptable_error:
-            if empty_mass_required > empty_mass_available:
-                # move takeoff_mass_guess up
-                pass
-            else:
-                # move takeoff_mass_guess down
-                pass
-
+            while error > self.acceptable_error:
+                if empty_mass_required > empty_mass_available:
+                    # move takeoff_mass_guess up
+                    pass
+                else:
+                    # move takeoff_mass_guess down
+                    pass
+            historical_trend.estimate_historical_empty_mass
+        else:
+            self.iterated_empty_mass = empty_mass_available
+            self.iterated_takeoff_mass = mission.takeoff_mass_guess

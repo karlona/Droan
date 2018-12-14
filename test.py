@@ -35,7 +35,7 @@ c = SimilarPlane(3, 7)
 d = SimilarPlane(4, 10)
 wiki_example = HistoricalTrend()
 wiki_example.add_similar_planes([a, b, c, d])
-e = wiki_example.estimate_empty_mass(1)
+e = wiki_example.estimate_historical_empty_mass(1)
 print("Slope is " + str(wiki_example.trend_slope))
 print("Y Intercept is " + str(wiki_example.trend_y_intercept))
 
