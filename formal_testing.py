@@ -49,9 +49,9 @@ class FormalTesting(unittest.TestCase):
                                          rutan_longeze, zenith_ch_200, pik_21, croses_eac_3, gatard_ag02, jodel_d92,
                                          jurca_mj_5ea2, piel_emeraude_cp320, piel_super_diamant, pottier_p50,
                                          stelio_frati_falco_f8l, nasa_gl_10])
-        droan_empty_mass_guess = roskam_home_built.estimate_empty_mass(12.5)
+        droan_empty_mass_guess = roskam_home_built.calculate_empty_mass_required(12.5)
         print(droan_empty_mass_guess)
-        self.assertEqual(round(roskam_home_built.empty_mass_guess), 10)
+        self.assertEqual(round(roskam_home_built.empty_mass_required), 10)
 
 
 if __name__ == '__main__':

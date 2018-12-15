@@ -194,7 +194,7 @@ class HistoricalTrend:
     def add_similar_planes(self, similar_planes):
         [self.similar_planes.append(plane) for plane in similar_planes]
 
-    def estimate_historical_empty_mass(self, takeoff_mass_guess):
+    def calculate_empty_mass_required(self, takeoff_mass_guess):
         errors = self.populate_errors()
         squared_errors = self.calculate_squared_errors(errors)
         y_intercept_derivative = self.calculate_y_intercept_derivative(squared_errors)
@@ -248,19 +248,22 @@ class MassIteration:
         return
 
     def iterate_empty_mass_available(self, motor, mission, battery, historical_trend):
-        empty_mass_required = historical_trend.estimate_historical_empty_mass(mission.takeoff_mass_guess)
+        empty_mass_required = historical_trend.calculate_empty_mass_required(mission.takeoff_mass_guess)
         empty_mass_available = mission.takeoff_mass_guess - mission.payload \
                                - BatteryPackMass(motor, mission, battery).battery_pack_mass
         error = (empty_mass_available - empty_mass_required) / empty_mass_required
         if error > self.acceptable_error:
             while error > self.acceptable_error:
                 if empty_mass_required > empty_mass_available:
-                    # move takeoff_mass_guess up
-                    pass
+                    mission.takeoff_mass_guess += empty_mass_required - empty_mass_available
                 else:
-                    # move takeoff_mass_guess down
-                    pass
-            historical_trend.estimate_historical_empty_mass
+                    mission.takeoff_mass_guess -= empty_mass_available - empty_mass_required
+                empty_mass_required = historical_trend.calculate_empty_mass_required(mission.takeoff_mass_guess)
+                empty_mass_available = mission.takeoff_mass_guess - mission.payload \
+                                       - BatteryPackMass(motor, mission, battery).battery_pack_mass
+                error = (empty_mass_available - empty_mass_required) / empty_mass_required
+            self.iterated_empty_mass = empty_mass_available
+            self.iterated_takeoff_mass = mission.takeoff_mass_guess
         else:
             self.iterated_empty_mass = empty_mass_available
             self.iterated_takeoff_mass = mission.takeoff_mass_guess
