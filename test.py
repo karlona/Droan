@@ -57,6 +57,10 @@ droan_empty_mass_required = roskam_home_built.calculate_empty_mass_required(12.5
 iteration = MassIteration(droan_motor, droan_endurance_mission, droan_battery, roskam_home_built)
 print("Empty mass is " + str(round(iteration.iterated_empty_mass, 3)) + " kilograms")
 print("Takeoff mass is " + str(round(iteration.iterated_takeoff_mass, 3)) + " kilograms")
+
+matching = Matching(0, 3, 10)
+print("Stall wing loading is " + str(round(matching.stall_wing_loading, 1)) + " Pascals")
+
 # print(iteration.iterated_empty_mass)
 # print(iteration.iterated_takeoff_mass)
 
