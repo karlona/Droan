@@ -2,7 +2,8 @@ import math
 
 
 class Phase:
-    """ This class details the various phases associated with the mission. """
+    """ Definitely a class
+    This class details the various phases associated with the mission. """
 
     def __init__(self, name, final_speed, lift_over_drag, time, vertical_speed, speed_change):
         """
@@ -35,7 +36,8 @@ class Phase:
 
 
 class Mission:
-    """ All the phases are combined into a mission. """
+    """ Definitely a class
+    All the phases are combined into a mission. """
 
     def __init__(self, takeoff_mass_guess, payload, lowest_voltage_maximum_power_ratio=0.8):
         self.all_phases = []
@@ -60,7 +62,8 @@ class Mission:
 
 
 class Motor:
-    """ User inputs specifications for the electric motor chosen. """
+    """ Definitely a class
+    User inputs specifications for the electric motor chosen. """
 
     def __init__(self, input_voltage, whole_chain_efficiency, max_continuous_power):
         """
@@ -74,7 +77,8 @@ class Motor:
 
 
 class Battery:
-    """ User inputs specifications for the battery chemistry chosen. """
+    """ Definitely a class
+    User inputs specifications for the battery chemistry chosen. """
 
     def __init__(self, nominal_cell_voltage, c_max, cell_capacity, specific_energy_density):
         """
@@ -91,7 +95,8 @@ class Battery:
 
 
 class PhasePower:
-    """ Calculate maximum power required for each phase. This seems like a large function lol, but whatever. We'll
+    """ Not a class, per se, but could be depending on the interpretation of the single responsibility principle
+    Calculate maximum power required for each phase. This seems like a large function lol, but whatever. We'll
     talk about next time we talk."""
 
     def __init__(self, mission):
@@ -134,7 +139,8 @@ class PhasePower:
 
 
 class BatteryPackMass:
-    """ The aircraft battery is sized to execute the provided mission with appropriate power and capacity.
+    """ Not a class, per se, but could be depending on the interpretation of the single responsibility principle
+    The aircraft battery is sized to execute the provided mission with appropriate power and capacity.
     Could this be inside of MassIteration? IDK, probably not."""
 
     def __init__(self, motor, mission, battery):
@@ -173,7 +179,8 @@ class BatteryPackMass:
 
 
 class SimilarPlane:
-    """ Similar planes to plane being designed."""
+    """ Definitely a class
+    Similar planes to plane being designed."""
 
     def __init__(self, takeoff_mass, empty_mass):
         self.takeoff_mass = takeoff_mass
@@ -183,7 +190,8 @@ class SimilarPlane:
 
 
 class HistoricalTrend:
-    """ Calculate historical trend data in order to calculate required empty mass of aircraft to be designed. """
+    """ Definitely a class
+    Calculate historical trend data in order to calculate required empty mass of aircraft to be designed. """
 
     def __init__(self):
         self.similar_planes = []
@@ -237,7 +245,8 @@ class HistoricalTrend:
 
 
 class MassIteration:
-    """ This class refines the takeoff mass guess for the mission to a point where the
+    """ Probably shouldn't be its own class
+    This class refines the takeoff mass guess for the mission to a point where the
     available and required empty masses are within half a percent of one another."""
 
     def __init__(self, motor, mission, battery, historical_trend, acceptable_error=0.005):
@@ -267,3 +276,23 @@ class MassIteration:
         else:
             self.iterated_empty_mass = empty_mass_available
             self.iterated_takeoff_mass = mission.takeoff_mass_guess
+
+
+class Matching:
+    """A class to size the wing and propulsion device based on various aircraft requirements. """
+
+    def __init__(self, stall_altitude, max_clean_cl, stall_speed):
+        self.wing_loading = None
+        self.weight_to_power = None
+        self.stall_wing_loading = self.size_to_stall(stall_altitude, max_clean_cl, stall_speed)
+
+    def size_to_stall(self, altitude, max_clean_cl, power_off_stall_speed):
+        density = self.convert_altitude_to_density(altitude)
+        return power_off_stall_speed ** 2 * density * max_clean_cl / 2
+
+    def convert_altitude_to_density(self, altitude):
+        """ Altitude in meters, density in kilograms per cubic meter. """
+        return 0.000000002490 * altitude ** 2 - 0.000105332443 * altitude + 1.211228027786
+
+    def size_to_takeoff(self):
+
