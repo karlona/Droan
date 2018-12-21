@@ -275,24 +275,28 @@ class MassIteration:
 
 
 class Matching:
-    """A class to size the wing and propulsion device based on various aircraft requirements. """
+    """A class to size the wing and propulsion device based on various aircraft requirements. Each sizing function is
+     represented by a nested list where each list's first value is a coefficient and the second value is the power of
+     the dependent variable (W/S). The matching chart is W/P vs W/S. """
 
-    def __init__(self, stall_altitude, max_clean_cl, stall_speed):
+    def __init__(self, stall_altitude, max_clean_cl, max_takeoff_cl, stall_speed):
         self.wing_loading = None
         self.power_loading = None
         self.stall_wing_loading = self.size_to_stall(stall_altitude, max_clean_cl, stall_speed)
 
     def size_to_stall(self, altitude, max_clean_cl, power_off_stall_speed):
         density = self.convert_altitude_to_density(altitude)
-        return power_off_stall_speed ** 2 * density * max_clean_cl / 2
+        return [[power_off_stall_speed ** 2 * density * max_clean_cl / 2, 0]]
 
     def convert_altitude_to_density(self, altitude):
         """ Altitude in meters, density in kilograms per cubic meter. """
         return 0.000000002490 * altitude ** 2 - 0.000105332443 * altitude + 1.211228027786
 
-    def size_to_takeoff(self, takeoff_distance):
+    def size_to_takeoff(self, takeoff_distance, altitude, max_takeoff_cl):
+        """ takeoff_distance in meters. takeoff_distance is from stand still to 50 ft altitude. """
         takeoff_parameter = self.calculate_takeoff_parameter(takeoff_distance)
-
+        density_ratio = self.convert_altitude_to_density(altitude) / self.convert_altitude_to_density(0)
+        return [[takeoff_parameter * density_ratio * max_takeoff_cl, -1]]
 
     def calculate_takeoff_parameter(self, takeoff_distance):
         a = 0.055822  # Roskam values converted to metric units
