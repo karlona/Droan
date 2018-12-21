@@ -279,7 +279,7 @@ class Matching:
 
     def __init__(self, stall_altitude, max_clean_cl, stall_speed):
         self.wing_loading = None
-        self.weight_to_power = None
+        self.power_loading = None
         self.stall_wing_loading = self.size_to_stall(stall_altitude, max_clean_cl, stall_speed)
 
     def size_to_stall(self, altitude, max_clean_cl, power_off_stall_speed):
@@ -290,5 +290,18 @@ class Matching:
         """ Altitude in meters, density in kilograms per cubic meter. """
         return 0.000000002490 * altitude ** 2 - 0.000105332443 * altitude + 1.211228027786
 
-    def size_to_takeoff(self):
-        pass
+    def size_to_takeoff(self, takeoff_distance):
+        takeoff_parameter = self.calculate_takeoff_parameter(takeoff_distance)
+
+
+    def calculate_takeoff_parameter(self, takeoff_distance):
+        a = 0.055822  # Roskam values converted to metric units
+        b = 8.680402  # Roskam values converted to metric units
+        c = -1 * takeoff_distance
+        takeoff_parameter_1 = -b + (b ** 2 - 4 * a * c) ** 0.5 / (2 * a)
+        takeoff_parameter_2 = -b - (b ** 2 - 4 * a * c) ** 0.5 / (2 * a)
+        if takeoff_parameter_1 > takeoff_parameter_2:
+            takeoff_parameter = takeoff_parameter_1
+        else:
+            takeoff_parameter = takeoff_parameter_2
+        return takeoff_parameter

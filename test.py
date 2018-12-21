@@ -58,7 +58,7 @@ iteration = MassIteration(droan_motor, droan_endurance_mission, droan_battery, r
 print("Empty mass is " + str(round(iteration.iterated_empty_mass, 3)) + " kilograms")
 print("Takeoff mass is " + str(round(iteration.iterated_takeoff_mass, 3)) + " kilograms")
 
-matching = Matching(0, 3, 10)
+matching = Matching(0, 3, 10)  # Cl_max should be ~1.5, but DEP multiplies it by a conservative factor of two.
 print("Stall wing loading is " + str(round(matching.stall_wing_loading, 1)) + " Pascals")
 
 # print(iteration.iterated_empty_mass)
