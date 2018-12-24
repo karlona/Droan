@@ -284,17 +284,17 @@ class Matching:
         self.power_loading = None
         self.stall_wing_loading = self.size_to_stall(stall_altitude, max_clean_cl, stall_speed)
 
-    def size_to_stall(self, altitude, max_clean_cl, power_off_stall_speed):
+    def size_to_stall(self, altitude, max_clean_cl, stall_speed):
         density = self.convert_altitude_to_density(altitude)
-        return [[power_off_stall_speed ** 2 * density * max_clean_cl / 2, 0]]
+        return [[stall_speed ** 2 * density * max_clean_cl / 2, 0]]
 
     def convert_altitude_to_density(self, altitude):
         """ Altitude in meters, density in kilograms per cubic meter. """
         return 0.000000002490 * altitude ** 2 - 0.000105332443 * altitude + 1.211228027786
 
-    def size_to_takeoff(self, takeoff_distance, altitude, max_takeoff_cl):
+    def size_to_takeoff(self, takeoff_field_length, altitude, max_takeoff_cl):
         """ takeoff_distance in meters. takeoff_distance is from stand still to 50 ft altitude. """
-        takeoff_parameter = self.calculate_takeoff_parameter(takeoff_distance)
+        takeoff_parameter = self.calculate_takeoff_parameter(takeoff_field_length)
         density_ratio = self.convert_altitude_to_density(altitude) / self.convert_altitude_to_density(0)
         return [[takeoff_parameter * density_ratio * max_takeoff_cl, -1]]
 
@@ -309,3 +309,8 @@ class Matching:
         else:
             takeoff_parameter = takeoff_parameter_2
         return takeoff_parameter
+
+    def size_to_landing(self, altitude, landing_field_length, max_landing_cl):
+        stall_speed = math.sqrt(landing_field_length / 0.591477)
+        landing_wing_loading = self.size_to_stall(altitude, max_landing_cl, stall_speed)
+        return landing_wing_loading
