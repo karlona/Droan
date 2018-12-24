@@ -312,5 +312,4 @@ class Matching:
 
     def size_to_landing(self, altitude, landing_field_length, max_landing_cl):
         stall_speed = math.sqrt(landing_field_length / 0.591477)
-        landing_wing_loading = self.size_to_stall(altitude, max_landing_cl, stall_speed)
-        return landing_wing_loading
+        return self.size_to_stall(altitude, max_landing_cl, stall_speed)
