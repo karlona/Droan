@@ -324,4 +324,13 @@ class Matching:
         else:
             raise NameError  # Eventually incorporate all of Roskam's plane types, but currently only homebuilt aircraft
         imperial_weight = mass / 0.453592
-        wetted_planform = 0.3048 ** 2 * (10 ** (c + d * math.log10(imperial_weight)))  # Roskam Eq. 3.22
+        imperial_wetted_planform = 10 ** (c + d * math.log10(imperial_weight))  # Roskam Eq. 3.22
+        wetted_planform = 0.3048 ** 2 * imperial_wetted_planform  # m ** 2 from ft ** 2
+
+    def estimate_skin_friction_coefficient(self):
+        density = self.convert_altitude_to_density(altitude)
+        reynolds_number = density * velocity * length / dynamic_viscosity
+        if reynolds_number < 500000:  # Nicolai Chapter 2 Review of Practical Aerodynamics Fig. 2.6
+            return 1.328 / math.sqrt(reynolds_number)
+        else:
+            return 0.455 / (math.log10(reynolds_number) ** 2.58)
