@@ -299,8 +299,8 @@ class Matching:
         return [[takeoff_parameter * density_ratio * max_takeoff_cl, -1]]
 
     def calculate_takeoff_parameter(self, takeoff_distance):
-        a = 0.055822  # Roskam values converted to metric units
-        b = 8.680402  # Roskam values converted to metric units
+        a = 0.055822  # Roskam values converted to metric units (FAR 23 propeller aircraft)
+        b = 8.680402  # Roskam values converted to metric units (FAR 23 propeller aircraft)
         c = -1 * takeoff_distance
         takeoff_parameter_1 = -b + (b ** 2 - 4 * a * c) ** 0.5 / (2 * a)
         takeoff_parameter_2 = -b - (b ** 2 - 4 * a * c) ** 0.5 / (2 * a)
@@ -313,3 +313,15 @@ class Matching:
     def size_to_landing(self, altitude, landing_field_length, max_landing_cl):
         stall_speed = math.sqrt(landing_field_length / 0.591477)
         return self.size_to_stall(altitude, max_landing_cl, stall_speed)
+
+    def size_to_climb(self):
+        pass
+
+    def estimate_drag_polar(self, mass, aircraft_type='Homebuilt'):
+        if aircraft_type == 'Homebuilt':
+            c = 1.2362
+            d = 0.4319
+        else:
+            raise NameError  # Eventually incorporate all of Roskam's plane types, but currently only homebuilt aircraft
+        imperial_weight = mass / 0.453592
+        wetted_planform = 0.3048 ** 2 * (10 ** (c + d * math.log10(imperial_weight)))  # Roskam Eq. 3.22
