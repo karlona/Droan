@@ -334,3 +334,6 @@ class Matching:
             return 1.328 / math.sqrt(reynolds_number)
         else:
             return 0.455 / (math.log10(reynolds_number) ** 2.58)
+
+    def convert_takeoff_mass_to_length(self, takeoff_mass):
+        return 10 ** (0.393171 * math.log10(takeoff_mass) - 0.313193)
