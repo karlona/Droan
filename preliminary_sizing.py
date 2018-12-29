@@ -328,6 +328,7 @@ class Matching:
         wetted_planform = 0.3048 ** 2 * imperial_wetted_planform  # m ** 2 from ft ** 2
 
     def estimate_skin_friction_coefficient(self):
+        length = self.convert_takeoff_mass_to_length(mass)
         density = self.convert_altitude_to_density(altitude)
         reynolds_number = density * velocity * length / dynamic_viscosity
         if reynolds_number < 500000:  # Nicolai Chapter 2 Review of Practical Aerodynamics Fig. 2.6
@@ -337,3 +338,10 @@ class Matching:
 
     def convert_takeoff_mass_to_length(self, takeoff_mass):
         return 10 ** (0.393171 * math.log10(takeoff_mass) - 0.313193)
+
+    def dynamic_viscosity(self, altitude):
+        potential_viscosity = -0.0000000003325805 * altitude + 0.00001792696
+        if potential_viscosity < 0.00001422:
+            return 0.00001422
+        else:
+            return potential_viscosity
