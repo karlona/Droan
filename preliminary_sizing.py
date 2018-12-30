@@ -254,7 +254,6 @@ class MassIteration:
         self.iterated_takeoff_mass = None
         self.acceptable_error = acceptable_error
         self.iterate_empty_mass_available(motor, mission, battery, historical_trend)
-        return
 
     def iterate_empty_mass_available(self, motor, mission, battery, historical_trend):
         empty_mass_required = historical_trend.calculate_empty_mass_required(mission.takeoff_mass_guess)
@@ -327,19 +326,42 @@ class Matching:
         imperial_wetted_planform = 10 ** (c + d * math.log10(imperial_weight))  # Roskam Eq. 3.22
         wetted_planform = 0.3048 ** 2 * imperial_wetted_planform  # m ** 2 from ft ** 2
 
-    def estimate_skin_friction_coefficient(self):
+    def calculate_imperial_equivalent_parasite_area(self, cf, imperial_wetted_area):
+        if cf == 0.002:
+            return 10 ** (math.log10(imperial_wetted_area) - 2.6990)
+        elif cf == 0.003:
+            return 10 ** (math.log10(imperial_wetted_area) - 2.5229)
+        elif cf == 0.004:
+            return 10 ** (math.log10(imperial_wetted_area) - 2.3979)
+        elif cf == 0.005:
+            return 10 ** (math.log10(imperial_wetted_area) - 2.3010)
+        elif cf == 0.006:
+            return 10 ** (math.log10(imperial_wetted_area) - 2.2218)
+        elif cf == 0.007:
+            return 10 ** (math.log10(imperial_wetted_area) - 2.1549)
+        elif cf == 0.008:
+            return 10 ** (math.log10(imperial_wetted_area) - 2.0969)
+        elif cf == 0.009:
+            return 10 ** (math.log10(imperial_wetted_area) - 2.0458)
+        else:
+            raise ValueError("cf must be an exact value between 0.002 and 0.009 in increments of 0.001!")
+
+    def estimate_skin_friction_coefficient(self, reynolds_number):
+        if reynolds_number < 500000:  # Nicolai Chapter 2 Review of Practical Aerodynamics Fig. 2.6
+            return round(1.328 / math.sqrt(reynolds_number), 3)
+        else:
+            return round(0.455 / (math.log10(reynolds_number) ** 2.58), 3)
+
+    def calculate_reynolds_number(self, altitude, mass, velocity):
         length = self.convert_takeoff_mass_to_length(mass)
         density = self.convert_altitude_to_density(altitude)
-        reynolds_number = density * velocity * length / dynamic_viscosity
-        if reynolds_number < 500000:  # Nicolai Chapter 2 Review of Practical Aerodynamics Fig. 2.6
-            return 1.328 / math.sqrt(reynolds_number)
-        else:
-            return 0.455 / (math.log10(reynolds_number) ** 2.58)
+        viscosity = self.calculate_dynamic_viscosity(altitude)
+        return density * velocity * length / viscosity
 
     def convert_takeoff_mass_to_length(self, takeoff_mass):
         return 10 ** (0.393171 * math.log10(takeoff_mass) - 0.313193)
 
-    def dynamic_viscosity(self, altitude):
+    def calculate_dynamic_viscosity(self, altitude):
         potential_viscosity = -0.0000000003325805 * altitude + 0.00001792696
         if potential_viscosity < 0.00001422:
             return 0.00001422
