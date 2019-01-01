@@ -329,23 +329,23 @@ class Matching:
     def estimate_wing_loading(self, altitude, speed, cl=0.5):
         return cl * self.convert_altitude_to_density(altitude) * speed ** 2 / 2
 
-    def calculate_imperial_equivalent_parasite_area(self, cf, imperial_wetted_area):
+    def calculate_equivalent_parasite_area(self, cf, imperial_wetted_area):
         if cf == 0.002:
-            return 10 ** (math.log10(imperial_wetted_area) - 2.6990)
+            return 0.09290304 * 10 ** (math.log10(imperial_wetted_area) - 2.6990)
         elif cf == 0.003:
-            return 10 ** (math.log10(imperial_wetted_area) - 2.5229)
+            return 0.09290304 * 10 ** (math.log10(imperial_wetted_area) - 2.5229)
         elif cf == 0.004:
-            return 10 ** (math.log10(imperial_wetted_area) - 2.3979)
+            return 0.09290304 * 10 ** (math.log10(imperial_wetted_area) - 2.3979)
         elif cf == 0.005:
-            return 10 ** (math.log10(imperial_wetted_area) - 2.3010)
+            return 0.09290304 * 10 ** (math.log10(imperial_wetted_area) - 2.3010)
         elif cf == 0.006:
-            return 10 ** (math.log10(imperial_wetted_area) - 2.2218)
+            return 0.09290304 * 10 ** (math.log10(imperial_wetted_area) - 2.2218)
         elif cf == 0.007:
-            return 10 ** (math.log10(imperial_wetted_area) - 2.1549)
+            return 0.09290304 * 10 ** (math.log10(imperial_wetted_area) - 2.1549)
         elif cf == 0.008:
-            return 10 ** (math.log10(imperial_wetted_area) - 2.0969)
+            return 0.09290304 * 10 ** (math.log10(imperial_wetted_area) - 2.0969)
         elif cf == 0.009:
-            return 10 ** (math.log10(imperial_wetted_area) - 2.0458)
+            return 0.09290304 * 10 ** (math.log10(imperial_wetted_area) - 2.0458)
         else:
             raise ValueError("cf must be an exact value between 0.002 and 0.009 in increments of 0.001!")
 
