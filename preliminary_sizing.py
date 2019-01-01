@@ -326,6 +326,9 @@ class Matching:
         imperial_wetted_planform = 10 ** (c + d * math.log10(imperial_weight))  # Roskam Eq. 3.22
         wetted_planform = 0.3048 ** 2 * imperial_wetted_planform  # m ** 2 from ft ** 2
 
+    def estimate_wing_loading(self, altitude, speed, cl=0.5):
+        return cl * self.convert_altitude_to_density(altitude) * speed ** 2 / 2
+
     def calculate_imperial_equivalent_parasite_area(self, cf, imperial_wetted_area):
         if cf == 0.002:
             return 10 ** (math.log10(imperial_wetted_area) - 2.6990)
