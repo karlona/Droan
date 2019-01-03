@@ -354,15 +354,13 @@ class Matching:
         return self.size_to_stall(altitude, max_landing_cl, stall_speed)
 
     def size_to_climb(self, mass, altitude, speed, aspect_ratio, gear_down=False, oswald_efficiency_factor=0.85):
-        zero_lift_drag_coefficient = self.estimate_drag_polar(mass, altitude, speed, aspect_ratio, gear_down,
-                                                              oswald_efficiency_factor)[0]
-        induced_drag_factor = self.estimate_drag_polar(mass, altitude, speed, aspect_ratio, gear_down,
-                                                       oswald_efficiency_factor)[1]
+        [zero_lift_drag_coefficient, induced_drag_factor] = self.estimate_drag_polar(
+            mass, altitude, speed, aspect_ratio, gear_down, oswald_efficiency_factor)
         return []
 
     def estimate_drag_polar(self, mass, altitude, speed, aspect_ratio, gear_down, oswald_efficiency_factor):
-        equivalent_parasite_area = self.calculate_equivalent_parasite_area(altitude, mass, speed)
-        wing_planform_area = self.estimate_wing_planform_area(self.mass, altitude, speed)
+        equivalent_parasite_area = self.calculate_equivalent_parasite_area(mass, altitude, speed)
+        wing_planform_area = self.estimate_wing_planform_area(mass, altitude, speed)
         zero_lift_drag_coefficient = equivalent_parasite_area / wing_planform_area
         if gear_down is True:
             zero_lift_drag_coefficient += 0.02
@@ -381,7 +379,7 @@ class Matching:
     def estimate_wing_loading(self, altitude, speed, cl=0.5):
         return cl * self.convert_altitude_to_density(altitude) * speed ** 2 / 2
 
-    def calculate_equivalent_parasite_area(self, altitude, mass, speed):
+    def calculate_equivalent_parasite_area(self, mass, altitude, speed):
         cf = self.estimate_skin_friction_coefficient(altitude, mass, speed)
         imperial_wetted_planform = self.calculate_imperial_wetted_planform(mass)
         if cf == 0.002:
