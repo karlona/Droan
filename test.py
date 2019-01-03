@@ -53,13 +53,23 @@ roskam_home_built.add_similar_planes([bowers_fly_baby_1b, bushby_mm_1_85, cassut
                                       rutan_longeze, zenith_ch_200, pik_21, croses_eac_3, gatard_ag02, jodel_d92,
                                       jurca_mj_5ea2, piel_emeraude_cp320, piel_super_diamant, pottier_p50,
                                       stelio_frati_falco_f8l, nasa_gl_10])
+
 droan_empty_mass_required = roskam_home_built.calculate_empty_mass_required(12.5)
 iteration = MassIteration(droan_motor, droan_endurance_mission, droan_battery, roskam_home_built)
 print("Empty mass is " + str(round(iteration.iterated_empty_mass, 3)) + " kilograms")
 print("Takeoff mass is " + str(round(iteration.iterated_takeoff_mass, 3)) + " kilograms")
 
-matching = Matching(0, 3, 10)  # Cl_max should be ~1.5, but DEP multiplies it by a conservative factor of two.
-print("Stall wing loading is " + str(round(matching.stall_wing_loading, 1)) + " Pascals")
+matching = Matching(iteration.iterated_takeoff_mass, max_wing_loading=2000)
+matching.create_matching_chart()
+
+# **** Plot various lines to be shown on Matching Chart ****
+matching.plot_stall_speed('Stall', 1000, 3, 10)
+matching.plot_takeoff_distance('Takeoff', 100, 1000, 3)  # Cl_max should be ~1.5, but DEP multiplies it by 2
+matching.plot_landing_distance('Landing', 1000, 100, 3)
+# **** Plot various lines to be shown on Matching Chart ****
+
+matching.plot_matching_chart()
+
 
 # print(iteration.iterated_empty_mass)
 # print(iteration.iterated_takeoff_mass)

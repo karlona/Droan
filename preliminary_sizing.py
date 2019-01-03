@@ -280,31 +280,39 @@ class Matching:
      represented by a nested list where each list's first value is a coefficient and the second value is the power of
      the dependent variable (W/S). The matching chart is W/P vs W/S. """
 
-    def __init__(self, stall_altitude, max_clean_cl, max_takeoff_cl, stall_speed):
+    def __init__(self, takeoff_mass, max_wing_loading=10000, max_power_loading=0.2):
         self.wing_loading = None
         self.power_loading = None
-        self.stall_wing_loading = self.size_to_stall(stall_altitude, max_clean_cl, stall_speed)
+        self.max_wing_loading = max_wing_loading
+        self.max_power_loading = max_power_loading
+        self.mass = takeoff_mass
 
-    def plot_matching_chart(self, altitude, max_clean_cl, stall_speed):
+    def create_matching_chart(self):
         plt.figure(1)
-        plt.ylim(0, 200)
-        plt.xlim(0, 200)
-        self.plot_stall_speed(altitude, max_clean_cl, stall_speed)
-        self.plot_takeoff_distance()
-        self.plot_landing_distance()
-        self.plot_climbing_requirements()
-        self.plot_maneuvering_requirements()
-        self.plot_cruise_speed_requirements()
+        plt.title('Matching Chart')
+        plt.xlabel('Wing Loading (Pascals)')
+        plt.ylabel('Power Loading (Newtons / Watt)')
+        plt.xlim(0, self.max_wing_loading)  # 200 psf is the equivalent of around 10,000 Pascals
+        plt.ylim(0, self.max_power_loading)  # 35 lbf/hp is the equivalent of around 0.2 Newtons per Watt
+
+    def plot_matching_chart(self):
+        plt.legend()
         plt.show()
 
-    def plot_stall_speed(self, altitude, max_clean_cl, stall_speed):
-        plt.vlines(self.size_to_stall(altitude, max_clean_cl, stall_speed), 0, 200, label='Stall')
+    def plot_stall_speed(self, name, altitude, max_clean_cl, stall_speed):
+        plt.vlines(self.size_to_stall(altitude, max_clean_cl, stall_speed),
+                   0, self.max_power_loading, label='{}'.format(name), color='red')
 
-    def plot_takeoff_distance(self):
-        pass
+    def plot_takeoff_distance(self, name, takeoff_field_length, altitude, max_takeoff_cl):
+        wing_loading = list(range(1, self.max_wing_loading + 1))
+        power_loading = [self.size_to_takeoff(takeoff_field_length, altitude, max_takeoff_cl)[0][0]
+                         * x ** self.size_to_takeoff(takeoff_field_length, altitude, max_takeoff_cl)[0][1]
+                         for x in wing_loading]
+        plt.plot(wing_loading, power_loading, label='{}'.format(name))
 
-    def plot_landing_distance(self):
-        pass
+    def plot_landing_distance(self, name, altitude, landing_field_length, max_landing_cl):
+        plt.vlines(self.size_to_landing(altitude, landing_field_length, max_landing_cl),
+                   0, self.max_power_loading, label='{}'.format(name))
 
     def plot_climbing_requirements(self):
         pass
@@ -345,11 +353,62 @@ class Matching:
         stall_speed = math.sqrt(landing_field_length / 0.591477)
         return self.size_to_stall(altitude, max_landing_cl, stall_speed)
 
-    def size_to_climb(self):
-        pass
+    def size_to_climb(self, mass, altitude, speed, aspect_ratio, gear_down=False, oswald_efficiency_factor=0.85):
+        zero_lift_drag_coefficient = self.estimate_drag_polar(mass, altitude, speed, aspect_ratio, gear_down,
+                                                              oswald_efficiency_factor)[0]
+        induced_drag_factor = self.estimate_drag_polar(mass, altitude, speed, aspect_ratio, gear_down,
+                                                       oswald_efficiency_factor)[1]
+        return []
 
-    def calculate_induced_drag_factor(self, aspect_ratio, oswald_efficiency_factor=0.85):
+    def estimate_drag_polar(self, mass, altitude, speed, aspect_ratio, gear_down, oswald_efficiency_factor):
+        equivalent_parasite_area = self.calculate_equivalent_parasite_area(altitude, mass, speed)
+        wing_planform_area = self.estimate_wing_planform_area(self.mass, altitude, speed)
+        zero_lift_drag_coefficient = equivalent_parasite_area / wing_planform_area
+        if gear_down is True:
+            zero_lift_drag_coefficient += 0.02
+        else:
+            pass
+        induced_drag_factor = self.calculate_induced_drag_factor(aspect_ratio, oswald_efficiency_factor)
+        return [zero_lift_drag_coefficient, induced_drag_factor]
+
+    def calculate_induced_drag_factor(self, aspect_ratio, oswald_efficiency_factor):
         return 1 / (math.pi * aspect_ratio * oswald_efficiency_factor)
+
+    def estimate_wing_planform_area(self, mass, altitude, speed):
+        weight = mass * 9.80665
+        return weight / self.estimate_wing_loading(altitude, speed)
+
+    def estimate_wing_loading(self, altitude, speed, cl=0.5):
+        return cl * self.convert_altitude_to_density(altitude) * speed ** 2 / 2
+
+    def calculate_equivalent_parasite_area(self, altitude, mass, speed):
+        cf = self.estimate_skin_friction_coefficient(altitude, mass, speed)
+        imperial_wetted_planform = self.calculate_imperial_wetted_planform(mass)
+        if cf == 0.002:
+            return 0.09290304 * 10 ** (math.log10(imperial_wetted_planform) - 2.6990)
+        elif cf == 0.003:
+            return 0.09290304 * 10 ** (math.log10(imperial_wetted_planform) - 2.5229)
+        elif cf == 0.004:
+            return 0.09290304 * 10 ** (math.log10(imperial_wetted_planform) - 2.3979)
+        elif cf == 0.005:
+            return 0.09290304 * 10 ** (math.log10(imperial_wetted_planform) - 2.3010)
+        elif cf == 0.006:
+            return 0.09290304 * 10 ** (math.log10(imperial_wetted_planform) - 2.2218)
+        elif cf == 0.007:
+            return 0.09290304 * 10 ** (math.log10(imperial_wetted_planform) - 2.1549)
+        elif cf == 0.008:
+            return 0.09290304 * 10 ** (math.log10(imperial_wetted_planform) - 2.0969)
+        elif cf == 0.009:
+            return 0.09290304 * 10 ** (math.log10(imperial_wetted_planform) - 2.0458)
+        else:
+            raise ValueError("cf must be an exact value between 0.002 and 0.009 in increments of 0.001!")
+
+    def estimate_skin_friction_coefficient(self, altitude, mass, speed):
+        # Nicolai Chapter 2 Review of Practical Aerodynamics Fig. 2.6
+        if self.calculate_reynolds_number(altitude, mass, speed) < 500000:
+            return round(1.328 / math.sqrt(self.calculate_reynolds_number(altitude, mass, speed)), 3)
+        else:
+            return round(0.455 / (math.log10(self.calculate_reynolds_number(altitude, mass, speed)) ** 2.58), 3)
 
     def calculate_imperial_wetted_planform(self, mass, aircraft_type='Homebuilt'):
         if aircraft_type == 'Homebuilt':
@@ -360,47 +419,14 @@ class Matching:
         imperial_weight = mass / 0.453592
         return 10 ** (c + d * math.log10(imperial_weight))  # Roskam Eq. 3.22
 
-    def estimate_wing_planform_area(self, mass, altitude, speed):
-        weight = mass * 9.80665
-        return weight / self.estimate_wing_loading(altitude, speed)
-
-    def estimate_wing_loading(self, altitude, speed, cl=0.5):
-        return cl * self.convert_altitude_to_density(altitude) * speed ** 2 / 2
-
-    def calculate_equivalent_parasite_area(self, cf, imperial_wetted_area):
-        if cf == 0.002:
-            return 0.09290304 * 10 ** (math.log10(imperial_wetted_area) - 2.6990)
-        elif cf == 0.003:
-            return 0.09290304 * 10 ** (math.log10(imperial_wetted_area) - 2.5229)
-        elif cf == 0.004:
-            return 0.09290304 * 10 ** (math.log10(imperial_wetted_area) - 2.3979)
-        elif cf == 0.005:
-            return 0.09290304 * 10 ** (math.log10(imperial_wetted_area) - 2.3010)
-        elif cf == 0.006:
-            return 0.09290304 * 10 ** (math.log10(imperial_wetted_area) - 2.2218)
-        elif cf == 0.007:
-            return 0.09290304 * 10 ** (math.log10(imperial_wetted_area) - 2.1549)
-        elif cf == 0.008:
-            return 0.09290304 * 10 ** (math.log10(imperial_wetted_area) - 2.0969)
-        elif cf == 0.009:
-            return 0.09290304 * 10 ** (math.log10(imperial_wetted_area) - 2.0458)
-        else:
-            raise ValueError("cf must be an exact value between 0.002 and 0.009 in increments of 0.001!")
-
-    def estimate_skin_friction_coefficient(self, reynolds_number):
-        if reynolds_number < 500000:  # Nicolai Chapter 2 Review of Practical Aerodynamics Fig. 2.6
-            return round(1.328 / math.sqrt(reynolds_number), 3)
-        else:
-            return round(0.455 / (math.log10(reynolds_number) ** 2.58), 3)
-
-    def calculate_reynolds_number(self, altitude, mass, velocity):
+    def calculate_reynolds_number(self, altitude, mass, speed):
         length = self.convert_takeoff_mass_to_length(mass)
         density = self.convert_altitude_to_density(altitude)
         viscosity = self.calculate_dynamic_viscosity(altitude)
-        return density * velocity * length / viscosity
+        return density * speed * length / viscosity
 
     def convert_takeoff_mass_to_length(self, takeoff_mass):
-        return 10 ** (0.393171 * math.log10(takeoff_mass) - 0.313193)
+        return 10 ** (0.393171 * math.log10(takeoff_mass) - 0.313193)  # Self built database with strong correlation
 
     def calculate_dynamic_viscosity(self, altitude):
         potential_viscosity = -0.0000000003325805 * altitude + 0.00001792696
