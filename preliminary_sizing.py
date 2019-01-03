@@ -344,10 +344,9 @@ class Matching:
         takeoff_parameter_1 = -b + (b ** 2 - 4 * a * c) ** 0.5 / (2 * a)
         takeoff_parameter_2 = -b - (b ** 2 - 4 * a * c) ** 0.5 / (2 * a)
         if takeoff_parameter_1 > takeoff_parameter_2:
-            takeoff_parameter = takeoff_parameter_1
+            return takeoff_parameter_1
         else:
-            takeoff_parameter = takeoff_parameter_2
-        return takeoff_parameter
+            return takeoff_parameter_2
 
     def size_to_landing(self, altitude, landing_field_length, max_landing_cl):
         stall_speed = math.sqrt(landing_field_length / 0.591477)
@@ -370,7 +369,7 @@ class Matching:
         return [zero_lift_drag_coefficient, induced_drag_factor]
 
     def calculate_induced_drag_factor(self, aspect_ratio, oswald_efficiency_factor):
-        return 1 / (math.pi * aspect_ratio * oswald_efficiency_factor)
+        return round(1 / (math.pi * aspect_ratio * oswald_efficiency_factor), 6)
 
     def estimate_wing_planform_area(self, mass, altitude, speed):
         weight = mass * 9.80665
