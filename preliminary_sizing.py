@@ -1,11 +1,12 @@
 import math
+import matplotlib.pyplot as plt
 
 
 class Phase:
     """ Definitely a class
     This class details the various phases associated with the mission. """
 
-    def __init__(self, name, final_speed, lift_over_drag, time, vertical_speed, speed_change):
+    def __init__(self, name, final_speed, lift_over_drag, time, vertical_speed, speed_change, final_altitude):
         """
         name is a string naming the mission phase
         final_speed in m/s
@@ -39,13 +40,14 @@ class Mission:
     """ Definitely a class
     All the phases are combined into a mission. """
 
-    def __init__(self, takeoff_mass_guess, payload, lowest_voltage_maximum_power_ratio=0.8):
+    def __init__(self, takeoff_mass_guess, payload, cruise_altitude, lowest_voltage_max_power_ratio=0.8):
         self.all_phases = []
         self.unique_phases = []
         self.takeoff_mass_guess = takeoff_mass_guess
         self.payload = payload
+        self.cruise_altitude = cruise_altitude
         # Lowest voltage ratio at which you still want to execute max power, i.e. 0.8 is 80% of full charge !voltage!
-        self.lowest_voltage_maximum_power_ratio = lowest_voltage_maximum_power_ratio
+        self.lowest_voltage_maximum_power_ratio = lowest_voltage_max_power_ratio
         self.maximum_power = None
 
     def add_all_phases(self, phases):
@@ -283,6 +285,36 @@ class Matching:
         self.power_loading = None
         self.stall_wing_loading = self.size_to_stall(stall_altitude, max_clean_cl, stall_speed)
 
+    def plot_matching_chart(self, altitude, max_clean_cl, stall_speed):
+        plt.figure(1)
+        plt.ylim(0, 200)
+        plt.xlim(0, 200)
+        self.plot_stall_speed(altitude, max_clean_cl, stall_speed)
+        self.plot_takeoff_distance()
+        self.plot_landing_distance()
+        self.plot_climbing_requirements()
+        self.plot_maneuvering_requirements()
+        self.plot_cruise_speed_requirements()
+        plt.show()
+
+    def plot_stall_speed(self, altitude, max_clean_cl, stall_speed):
+        plt.vlines(self.size_to_stall(altitude, max_clean_cl, stall_speed), 0, 200, label='Stall')
+
+    def plot_takeoff_distance(self):
+        pass
+
+    def plot_landing_distance(self):
+        pass
+
+    def plot_climbing_requirements(self):
+        pass
+
+    def plot_maneuvering_requirements(self):
+        pass
+
+    def plot_cruise_speed_requirements(self):
+        pass
+
     def size_to_stall(self, altitude, max_clean_cl, stall_speed):
         density = self.convert_altitude_to_density(altitude)
         return [[stall_speed ** 2 * density * max_clean_cl / 2, 0]]
@@ -316,9 +348,8 @@ class Matching:
     def size_to_climb(self):
         pass
 
-    def estimate_drag_polar(self, mass, aircraft_type='Homebuilt'):
-
-        wetted_planform = 0.3048 ** 2 * imperial_wetted_planform  # m ** 2 from ft ** 2
+    def calculate_induced_drag_factor(self, aspect_ratio, oswald_efficiency_factor=0.85):
+        return 1 / (math.pi * aspect_ratio * oswald_efficiency_factor)
 
     def calculate_imperial_wetted_planform(self, mass, aircraft_type='Homebuilt'):
         if aircraft_type == 'Homebuilt':
@@ -328,6 +359,10 @@ class Matching:
             raise NameError  # Eventually incorporate all of Roskam's plane types, but currently only homebuilt aircraft
         imperial_weight = mass / 0.453592
         return 10 ** (c + d * math.log10(imperial_weight))  # Roskam Eq. 3.22
+
+    def estimate_wing_planform_area(self, mass, altitude, speed):
+        weight = mass * 9.80665
+        return weight / self.estimate_wing_loading(altitude, speed)
 
     def estimate_wing_loading(self, altitude, speed, cl=0.5):
         return cl * self.convert_altitude_to_density(altitude) * speed ** 2 / 2

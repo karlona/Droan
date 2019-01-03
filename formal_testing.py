@@ -10,12 +10,12 @@ class FormalTesting(unittest.TestCase):
         land = Phase("land", 0, 5, 30, -1, -13.4)
         land_duplicate = Phase("land", 0, 5, 30, -1, -13.4)
 
-        mission1 = Mission(12.5)
+        mission1 = Mission(12.5, 1, 100)
         mission1.add_all_phases([taxi, takeoff, land, land_duplicate])
         self.assertEqual(len(mission1.unique_phases), 3)
         self.assertEqual(len(mission1.all_phases), 4)
 
-        mission2 = Mission(13.5)
+        mission2 = Mission(13.5, 1, 100)
         mission2.add_all_phases([taxi, taxi, taxi])
         self.assertEqual(len(mission2.unique_phases), 1)
         self.assertEqual(len(mission2.all_phases), 3)

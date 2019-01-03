@@ -1,15 +1,15 @@
 from preliminary_sizing import *
 
-taxi = Phase("taxi", 3, 15, 30, 0, 3)
-takeoff = Phase("takeoff", 13.4, 15, 10, 0, 13.4)
-climb = Phase("climb", 22.4, 10, 48, 2.54, 9)
-endurance = Phase("endurance", 22.4, 20, 1800, 0, 0)
-descent = Phase("descent", 13.4, 15, 48, -2.54, -9)
-pattern = Phase("pattern", 13.4, 10, 60, 0, 0)
-land = Phase("land", 0, 5, 30, -1, -13.4)
-land_duplicate = Phase("land", 0, 5, 30, -1, -13.4)
+taxi = Phase("taxi", 3, 15, 30, 0, 3, 0)
+takeoff = Phase("takeoff", 13.4, 15, 10, 0, 13.4, 0)
+climb = Phase("climb", 22.4, 10, 48, 2.5, 9, 120)
+endurance = Phase("endurance", 22.4, 20, 1800, 0, 0, 120)
+descent = Phase("descent", 13.4, 15, 36, -2.5, -9, 30)
+pattern = Phase("pattern", 13.4, 10, 60, 0, 0, 30)
+land = Phase("land", 0, 5, 30, -1, -13.4, 0)
+land_duplicate = Phase("land", 0, 5, 30, -1, -13.4, 0)
 
-droan_endurance_mission = Mission(12.5, 1)
+droan_endurance_mission = Mission(12.5, 1, 100)
 droan_motor = Motor(11.1, 0.8, 110)
 droan_battery = Battery(11.1, 25, 2.2, 140)  # Gens ace 25C 2200mah 11.1V 3S Lipo Battery
 
