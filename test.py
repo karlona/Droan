@@ -66,6 +66,8 @@ matching.create_matching_chart()
 matching.plot_stall_speed('Stall', 1000, 3, 10)
 matching.plot_takeoff_distance('Takeoff', 100, 1000, 3)  # Cl_max should be ~1.5, but DEP multiplies it by 2
 matching.plot_landing_distance('Landing', 1000, 100, 3)
+matching.plot_climbing_requirements(
+    iteration.iterated_takeoff_mass, climb.final_altitude, climb.final_speed, 10, gear_down=True)
 # **** Plot various lines to be shown on Matching Chart ****
 
 matching.plot_matching_chart()

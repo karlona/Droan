@@ -21,6 +21,7 @@ class Phase:
         self.time = time
         self.vertical_speed = vertical_speed
         self.speed_change = speed_change
+        self.final_altitude = final_altitude
         self.maximum_power = None
 
     def add_maximum_power(self, power):
@@ -314,8 +315,9 @@ class Matching:
         plt.vlines(self.size_to_landing(altitude, landing_field_length, max_landing_cl),
                    0, self.max_power_loading, label='{}'.format(name))
 
-    def plot_climbing_requirements(self):
-        pass
+    def plot_climbing_requirements(self, mass, altitude, speed, aspect_ratio, gear_down=False,
+                                   oswald_efficiency_factor=0.85, cl=0.5):
+        self.size_to_climb(mass, altitude, speed, aspect_ratio, gear_down, oswald_efficiency_factor, cl)
 
     def plot_maneuvering_requirements(self):
         pass
@@ -352,11 +354,10 @@ class Matching:
         stall_speed = math.sqrt(landing_field_length / 0.591477)
         return self.size_to_stall(altitude, max_landing_cl, stall_speed)
 
-    def size_to_climb(self, mass, altitude, speed, aspect_ratio, gear_down=False, oswald_efficiency_factor=0.85,
-                      cl=0.5):
+    def size_to_climb(self, mass, altitude, speed, aspect_ratio, gear_down, oswald_efficiency_factor, cl):
         [zero_lift_drag_coefficient, induced_drag_factor] = self.estimate_drag_polar(
             mass, altitude, speed, aspect_ratio, gear_down, oswald_efficiency_factor, cl)
-        return []
+        print(zero_lift_drag_coefficient, induced_drag_factor)
 
     def estimate_drag_polar(self, mass, altitude, speed, aspect_ratio, gear_down, oswald_efficiency_factor, cl):
         zero_lift_drag_coefficient = self.calculate_zero_lift_drag_coefficient(mass, altitude, speed, cl, gear_down)
@@ -371,7 +372,7 @@ class Matching:
             zero_lift_drag_coefficient += 0.02
         else:
             pass
-        return zero_lift_drag_coefficient
+        return round(zero_lift_drag_coefficient, 6)
 
     def calculate_induced_drag_factor(self, aspect_ratio, oswald_efficiency_factor):
         return round(1 / (math.pi * aspect_ratio * oswald_efficiency_factor), 6)
