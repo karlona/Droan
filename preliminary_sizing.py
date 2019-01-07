@@ -315,9 +315,12 @@ class Matching:
         plt.vlines(self.size_to_landing(altitude, landing_field_length, max_landing_cl),
                    0, self.max_power_loading, label='{}'.format(name))
 
-    def plot_climbing_requirements(self, mass, altitude, speed, aspect_ratio, gear_down=False,
-                                   oswald_efficiency_factor=0.85, cl=0.5):
-        self.size_to_climb(mass, altitude, speed, aspect_ratio, gear_down, oswald_efficiency_factor, cl)
+    def plot_climbing_requirements(self, name, mass, altitude, speed, aspect_ratio, rate_of_climb,
+                                   propeller_efficiency=0.85, gear_down=False, oswald_efficiency_factor=0.85, cl=0.5):
+        [wing_loading, power_loading] = self.size_to_climb(
+            mass, altitude, speed, aspect_ratio, gear_down, oswald_efficiency_factor, cl,
+            rate_of_climb, propeller_efficiency)
+        plt.plot(wing_loading, power_loading, label='{}'.format(name), color='green')
 
     def plot_maneuvering_requirements(self):
         pass
@@ -354,12 +357,24 @@ class Matching:
         stall_speed = math.sqrt(landing_field_length / 0.591477)
         return self.size_to_stall(altitude, max_landing_cl, stall_speed)
 
-    def size_to_climb(self, mass, altitude, speed, aspect_ratio, gear_down, oswald_efficiency_factor, cl):
-        [zero_lift_drag_coefficient, induced_drag_factor] = self.estimate_drag_polar(
-            mass, altitude, speed, aspect_ratio, gear_down, oswald_efficiency_factor, cl)
-        print(zero_lift_drag_coefficient, induced_drag_factor)
+    def size_to_climb(self, mass, altitude, speed, aspect_ratio, gear_down, oswald_efficiency_factor, cl,
+                      rate_of_climb, propeller_efficiency):
+        wing_loading = list(range(1, self.max_wing_loading + 1))
+        zero_lift_drag_coefficient = self.estimate_drag_polar(
+            mass, altitude, speed, aspect_ratio, gear_down, oswald_efficiency_factor, cl)[0]
+        imperial_rate_of_climb = rate_of_climb * 196.85  # m/s to ft/min
+        drag_polar_for_best_climb = self.calculate_max_rate_of_climb(
+            aspect_ratio, oswald_efficiency_factor, zero_lift_drag_coefficient)
+        density_ratio = self.convert_altitude_to_density(altitude) / self.convert_altitude_to_density(0)
+        # Roskam Aircraft Design Part I Section 3.4.5.1
+        power_loading = [(1 / 167.64) * propeller_efficiency /
+                         ((imperial_rate_of_climb / 33000) + (((x / 47.8803) ** (1 / 2)) /
+                                                              (19 * drag_polar_for_best_climb *
+                                                               density_ratio ** (1 / 2)))) for x in wing_loading]
+        return wing_loading, power_loading
 
     def calculate_max_rate_of_climb(self, aspect_ratio, oswald_efficiency_factor, zero_lift_drag_coefficient):
+        # Roskam Aircraft Design Part I Equation 3.27
         return (1.345 * (aspect_ratio * oswald_efficiency_factor) ** (3 / 4)) / (zero_lift_drag_coefficient ** (1 / 4))
 
     def estimate_drag_polar(self, mass, altitude, speed, aspect_ratio, gear_down, oswald_efficiency_factor, cl):
