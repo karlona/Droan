@@ -309,11 +309,11 @@ class Matching:
         power_loading = [self.size_to_takeoff(takeoff_field_length, altitude, max_takeoff_cl)[0][0]
                          * x ** self.size_to_takeoff(takeoff_field_length, altitude, max_takeoff_cl)[0][1]
                          for x in wing_loading]
-        plt.plot(wing_loading, power_loading, label='{}'.format(name))
+        plt.plot(wing_loading, power_loading, label='{}'.format(name), color='brown')
 
     def plot_landing_distance(self, name, altitude, landing_field_length, max_landing_cl):
         plt.vlines(self.size_to_landing(altitude, landing_field_length, max_landing_cl),
-                   0, self.max_power_loading, label='{}'.format(name))
+                   0, self.max_power_loading, label='{}'.format(name), color='black')
 
     def plot_climbing_requirements(self, name, mass, altitude, speed, aspect_ratio, rate_of_climb,
                                    propeller_efficiency=0.85, gear_down=False, oswald_efficiency_factor=0.85, cl=0.5):
