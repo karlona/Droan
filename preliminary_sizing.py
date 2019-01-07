@@ -359,6 +359,9 @@ class Matching:
             mass, altitude, speed, aspect_ratio, gear_down, oswald_efficiency_factor, cl)
         print(zero_lift_drag_coefficient, induced_drag_factor)
 
+    def calculate_max_rate_of_climb(self, aspect_ratio, oswald_efficiency_factor, zero_lift_drag_coefficient):
+        return (1.345 * (aspect_ratio * oswald_efficiency_factor) ** (3 / 4)) / (zero_lift_drag_coefficient ** (1 / 4))
+
     def estimate_drag_polar(self, mass, altitude, speed, aspect_ratio, gear_down, oswald_efficiency_factor, cl):
         zero_lift_drag_coefficient = self.calculate_zero_lift_drag_coefficient(mass, altitude, speed, cl, gear_down)
         induced_drag_factor = self.calculate_induced_drag_factor(aspect_ratio, oswald_efficiency_factor)
