@@ -281,7 +281,7 @@ class Matching:
      represented by a nested list where each list's first value is a coefficient and the second value is the power of
      the dependent variable (W/S). The matching chart is W/P vs W/S. """
 
-    def __init__(self, takeoff_mass, max_wing_loading=10000, max_power_loading=0.2):
+    def __init__(self, takeoff_mass, max_wing_loading=10000, max_power_loading=0.3):
         self.wing_loading = None
         self.power_loading = None
         self.max_wing_loading = max_wing_loading
