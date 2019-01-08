@@ -330,7 +330,7 @@ class Matching:
 
     def size_to_stall(self, altitude, max_clean_cl, stall_speed):
         density = self.convert_altitude_to_density(altitude)
-        return [[stall_speed ** 2 * density * max_clean_cl / 2, 0]]
+        return stall_speed ** 2 * density * max_clean_cl / 2
 
     def convert_altitude_to_density(self, altitude):
         """ Altitude in meters, density in kilograms per cubic meter. """
