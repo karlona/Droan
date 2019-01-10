@@ -322,11 +322,10 @@ class Matching:
             rate_of_climb, propeller_efficiency)
         plt.plot(wing_loading, power_loading, label='{}'.format(name), color='green')
 
-    def plot_maneuvering_requirements(self):
-        pass
-
-    def plot_cruise_speed_requirements(self):
-        pass
+    def plot_cruise_speed_requirements(self, name, speed, altitude, cruise_lift_coefficient, mass, aspect_ratio,
+                                       oswald_efficiency_factor=0.85, propeller_efficiency=0.85, gear_down=True):
+        [wing_loading, power_loading] = self.size_to_cruise(speed, altitude, cruise_lift_coefficient, mass, aspect_ratio, oswald_efficiency_factor, propeller_efficiency, gear_down)
+        plt.plot(wing_loading, power_loading, label='{}'.format(name), color='orange')
 
     def size_to_stall(self, altitude, max_clean_cl, stall_speed):
         density = self.convert_altitude_to_density(altitude)
@@ -356,6 +355,17 @@ class Matching:
     def size_to_landing(self, altitude, landing_field_length, max_landing_cl):
         stall_speed = math.sqrt(landing_field_length / 0.591477)
         return self.size_to_stall(altitude, max_landing_cl, stall_speed)
+
+    def size_to_cruise(self, speed, altitude, cruise_lift_coefficient, mass, aspect_ratio, oswald_efficiency_factor,
+                       propeller_efficiency, gear_down):
+        wing_loading = list(range(1, self.max_wing_loading + 1))
+        density = self.convert_altitude_to_density(altitude)
+        [zero_lift_drag_coefficient, induced_drag_factor] = self.estimate_drag_polar(
+            mass, altitude, speed, aspect_ratio, gear_down, oswald_efficiency_factor, cruise_lift_coefficient)
+        cruise_drag_coefficient = zero_lift_drag_coefficient + induced_drag_factor * cruise_lift_coefficient ** 2
+        power_loading = [((2 * propeller_efficiency) / (speed ** 3 * density * cruise_drag_coefficient)) * x
+                         for x in wing_loading]
+        return wing_loading, power_loading
 
     def size_to_climb(self, mass, altitude, speed, aspect_ratio, gear_down, oswald_efficiency_factor, cl,
                       rate_of_climb, propeller_efficiency):
