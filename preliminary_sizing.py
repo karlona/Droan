@@ -316,7 +316,7 @@ class Matching:
                    0, self.max_power_loading, label='{}'.format(name), color='purple')
 
     def plot_climbing_requirements(self, name, mass, altitude, speed, aspect_ratio, rate_of_climb,
-                                   propeller_efficiency=0.85, gear_down=False, oswald_efficiency_factor=0.85, cl=1.8):
+                                   propeller_efficiency=0.85, gear_down=False, oswald_efficiency_factor=0.85, cl=1.5):
         [wing_loading, power_loading] = self.size_to_climb(
             mass, altitude, speed, aspect_ratio, gear_down, oswald_efficiency_factor, cl,
             rate_of_climb, propeller_efficiency)
