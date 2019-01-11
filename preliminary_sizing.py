@@ -300,32 +300,36 @@ class Matching:
         plt.legend()
         plt.show()
 
-    def plot_stall_speed(self, name, altitude, max_clean_cl, stall_speed):
+    def plot_stall_speed(self, name, altitude, max_clean_cl, stall_speed, pattern='-'):
         plt.vlines(self.size_to_stall(altitude, max_clean_cl, stall_speed),
-                   0, self.max_power_loading, label='{}'.format(name), color='red')
+                   0, self.max_power_loading, label='{}'.format(name), color='red', linestyles='{}'.format(pattern))
 
-    def plot_takeoff_distance(self, name, takeoff_field_length, altitude, max_takeoff_cl):
+    def plot_takeoff_distance(self, name, takeoff_field_length, altitude, max_takeoff_cl, pattern='-'):
         wing_loading = list(range(1, self.max_wing_loading + 1))
         power_loading = [self.size_to_takeoff(takeoff_field_length, altitude, max_takeoff_cl)[0][0]
                          * x ** self.size_to_takeoff(takeoff_field_length, altitude, max_takeoff_cl)[0][1]
                          for x in wing_loading]
-        plt.plot(wing_loading, power_loading, label='{}'.format(name), color='blue')
+        plt.plot(wing_loading, power_loading, label='{}'.format(name), color='blue', ls='{}'.format(pattern))
 
-    def plot_landing_distance(self, name, altitude, landing_field_length, max_landing_cl):
+    def plot_landing_distance(self, name, altitude, landing_field_length, max_landing_cl, pattern='-'):
         plt.vlines(self.size_to_landing(altitude, landing_field_length, max_landing_cl),
-                   0, self.max_power_loading, label='{}'.format(name), color='purple')
+                   0, self.max_power_loading, label='{}'.format(name), color='purple', linestyles='{}'.format(pattern))
 
     def plot_climbing_requirements(self, name, mass, altitude, speed, aspect_ratio, rate_of_climb,
-                                   propeller_efficiency=0.85, gear_down=False, oswald_efficiency_factor=0.85, cl=1.5):
+                                   propeller_efficiency=0.85, gear_down=False,
+                                   oswald_efficiency_factor=0.85, cl=1.5, pattern='-'):
         [wing_loading, power_loading] = self.size_to_climb(
             mass, altitude, speed, aspect_ratio, gear_down, oswald_efficiency_factor, cl,
             rate_of_climb, propeller_efficiency)
-        plt.plot(wing_loading, power_loading, label='{}'.format(name), color='green')
+        plt.plot(wing_loading, power_loading, label='{}'.format(name), color='green', ls='{}'.format(pattern))
 
     def plot_cruise_speed_requirements(self, name, speed, altitude, cruise_lift_coefficient, mass, aspect_ratio,
-                                       oswald_efficiency_factor=0.85, propeller_efficiency=0.85, gear_down=True):
-        [wing_loading, power_loading] = self.size_to_cruise(speed, altitude, cruise_lift_coefficient, mass, aspect_ratio, oswald_efficiency_factor, propeller_efficiency, gear_down)
-        plt.plot(wing_loading, power_loading, label='{}'.format(name), color='orange')
+                                       oswald_efficiency_factor=0.85, propeller_efficiency=0.85,
+                                       gear_down=True, pattern='-'):
+        [wing_loading, power_loading] = self.size_to_cruise(speed, altitude, cruise_lift_coefficient, mass,
+                                                            aspect_ratio, oswald_efficiency_factor,
+                                                            propeller_efficiency, gear_down)
+        plt.plot(wing_loading, power_loading, label='{}'.format(name), color='orange', ls='{}'.format(pattern))
 
     def size_to_stall(self, altitude, max_clean_cl, stall_speed):
         density = self.convert_altitude_to_density(altitude)
