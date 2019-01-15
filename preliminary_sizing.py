@@ -297,7 +297,7 @@ class Matching:
         plt.ylim(0, self.max_power_loading)  # 35 lbf/hp is the equivalent of around 0.2 Newtons per Watt
 
     def plot_matching_chart(self):
-        plt.legend()
+        plt.legend(loc=1)
         plt.show()
 
     def plot_stall_speed(self, name, altitude, max_clean_cl, stall_speed, pattern='-'):
