@@ -64,12 +64,12 @@ print(matching.estimate_drag_polar(iteration.iterated_takeoff_mass, 1000, 13, 6,
 matching.create_matching_chart()
 
 # **** Plot various lines to be shown on Matching Chart ****
-matching.plot_stall_speed('Stall 10 m/s CL=1.5', 1000, 1.5, 10)
-matching.plot_stall_speed('Stall 10 m/s CL=2.0', 1000, 2.0, 10, pattern='--')
-matching.plot_stall_speed('Stall 10 m/s CL=2.5', 1000, 2.5, 10, pattern='-.')
-matching.plot_stall_speed('Stall 10 m/s CL=3.0', 1000, 3.0, 10, pattern=':')
-matching.plot_stall_speed('Stall 10 m/s CL=4.0', 1000, 4.0, 10)
-matching.plot_stall_speed('Stall 10 m/s CL=5.0', 1000, 5.0, 10)
+matching.plot_stall_speed('Stall 13 m/s CL=1.5', 1000, 1.5, 13)
+matching.plot_stall_speed('Stall 13 m/s CL=2.0', 1000, 2.0, 13, pattern='--')
+matching.plot_stall_speed('Stall 13 m/s CL=2.5', 1000, 2.5, 13, pattern='-.')
+matching.plot_stall_speed('Stall 13 m/s CL=3.0', 1000, 3.0, 13, pattern=':')
+matching.plot_stall_speed('Stall 13 m/s CL=4.0', 1000, 4.0, 13)
+matching.plot_stall_speed('Stall 13 m/s CL=5.0', 1000, 5.0, 13)
 matching.plot_takeoff_distance('Takeoff CL=1.5', 100, 1000, 1.5)  # Cl_max should be ~1.5, but DEP multiplies it by 2
 matching.plot_takeoff_distance('Takeoff CL=2.0', 100, 1000, 2.0, pattern='--')
 matching.plot_takeoff_distance('Takeoff CL=2.5', 100, 1000, 2.5, pattern='-.')
@@ -79,15 +79,13 @@ matching.plot_landing_distance('Landing CL=2.0', 1000, 100, 2.0, pattern='--')
 matching.plot_landing_distance('Landing CL=2.5', 1000, 100, 2.5, pattern='-.')
 matching.plot_landing_distance('Landing CL=3.0', 1000, 100, 3.0, pattern=':')
 matching.plot_climbing_requirements(
-    'Climb AR=4', iteration.iterated_takeoff_mass, 1000, climb.final_speed, 4, 2.54, gear_down=True)
+    'Climb AR=5', iteration.iterated_takeoff_mass, 1000, climb.final_speed, 5, 2.54, gear_down=True)
 matching.plot_climbing_requirements(
     'Climb AR=6', iteration.iterated_takeoff_mass, 1000, climb.final_speed, 6, 2.54, gear_down=True, pattern='--')
 matching.plot_climbing_requirements(
-    'Climb AR=8', iteration.iterated_takeoff_mass, 1000, climb.final_speed, 8, 2.54, gear_down=True, pattern='-.')
+    'Climb AR=7', iteration.iterated_takeoff_mass, 1000, climb.final_speed, 7, 2.54, gear_down=True, pattern='-.')
 matching.plot_climbing_requirements(
-    'Climb AR=10', iteration.iterated_takeoff_mass, 1000, climb.final_speed, 10, 2.54, gear_down=True, pattern=':')
-matching.plot_climbing_requirements(
-    'Climb AR=12', iteration.iterated_takeoff_mass, 1000, climb.final_speed, 12, 2.54, gear_down=True, pattern='--')
+    'Climb AR=8', iteration.iterated_takeoff_mass, 1000, climb.final_speed, 8, 2.54, gear_down=True, pattern=':')
 matching.plot_cruise_speed_requirements('Cruise 22.5 m/s', 22.5, 100, 0.5, iteration.iterated_takeoff_mass, 10)
 # **** Plot various lines to be shown on Matching Chart ****
 
